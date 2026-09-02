@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="bug_page_title">Signaler un bug - Mega Clone</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .page-header { background: var(--bg-secondary); padding: 6rem 10% 2rem; border-bottom: 1px solid var(--border); }
+        .page-title { font-size: 2.5rem; color: white; margin-bottom: 1rem; }
+        .page-content { padding: 4rem 10%; max-width: 600px; margin: 0 auto; color: var(--text-secondary); line-height: 1.8; }
+        .form-group { margin-bottom: 20px; }
+        .form-control { width: 100%; padding: 12px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: white; border-radius: 6px; }
+    </style>
+</head>
+<body class="landing-page">
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="index.html" style="color:white; text-decoration:none;"><i class="fa-solid fa-cloud"></i> MEGA CLONE</a>
+            </div>
+            <div class="navbar-actions">
+                <a href="index.html" class="btn btn-secondary" data-i18n="back_to_home">Retour à l'accueil</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="page-header" style="text-align: center;">
+        <h1 class="page-title"><i class="fa-solid fa-bug" style="color: #ef4444;"></i> <span data-i18n="bug_title">Signaler un Bug</span></h1>
+        <p style="color: var(--text-secondary);" data-i18n="bug_subtitle">Aidez-nous à améliorer la plateforme.</p>
+    </header>
+
+    <main class="page-content">
+        <form onsubmit="event.preventDefault(); alert(i18n.t('bug_success', 'Merci ! Le bug a été transmis à notre équipe technique.'));">
+            <div class="form-group">
+                <label style="display:block; margin-bottom: 8px;" data-i18n="bug_issue_title">Titre du problème</label>
+                <input type="text" class="form-control" required data-i18n-placeholder="bug_issue_placeholder" placeholder="Ex: Impossible de télécharger le fichier...">
+            </div>
+            <div class="form-group">
+                <label style="display:block; margin-bottom: 8px;" data-i18n="bug_issue_desc">Description détaillée (Étapes pour reproduire)</label>
+                <textarea class="form-control" rows="8" required data-i18n-placeholder="bug_issue_desc_placeholder" placeholder="1. Je clique sur...&#10;2. Il se passe..."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary" style="background: #ef4444; border-color: #ef4444; width: 100%;" data-i18n="bug_send_report">Envoyer le rapport</button>
+        </form>
+    </main>
+
+    <!-- Footer Pro -->
+    <footer class="footer-pro" style="background: #18191f; padding: 4rem 10% 2rem; border-top: 1px solid var(--border);">
+        <div style="display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between; margin-bottom: 3rem;">
+            <div style="flex: 1; min-width: 250px;">
+                <div class="navbar-brand" style="margin-bottom: 1rem; color: white; font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-cloud" style="color: var(--accent);"></i> MEGA CLONE
+                </div>
+                <p id="pub-footer-desc" style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;"></p>
+                <div style="display: flex; gap: 15px;">
+                    <a href="#" id="pub-footer-twitter" style="color: var(--text-secondary); font-size: 1.2rem;" class="footer-icon-link"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" id="pub-footer-facebook" style="color: var(--text-secondary); font-size: 1.2rem;" class="footer-icon-link"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" id="pub-footer-github" style="color: var(--text-secondary); font-size: 1.2rem;" class="footer-icon-link"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" id="pub-footer-instagram" style="color: var(--text-secondary); font-size: 1.2rem;" class="footer-icon-link"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 40px; flex: 2; min-width: 300px; justify-content: flex-end;">
+                <div style="min-width: 150px;">
+                    <h4 style="color: white; margin-bottom: 1.5rem; font-size: 1.1rem;" data-i18n="footer_legal">Légal</h4>
+                    <ul id="pub-footer-legal" style="list-style: none; padding: 0;"></ul>
+                </div>
+                <div style="min-width: 150px;">
+                    <h4 style="color: white; margin-bottom: 1.5rem; font-size: 1.1rem;" data-i18n="footer_support">Support</h4>
+                    <ul id="pub-footer-support" style="list-style: none; padding: 0;"></ul>
+                </div>
+            </div>
+        </div>
+        <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; color: var(--text-secondary); font-size: 0.9rem;">
+            <p id="pub-footer-copyright"></p>
+            <div style="display: flex; gap: 20px;">
+                <span>
+                    <i class="fa-solid fa-earth-europe"></i>
+                    <select class="lang-switcher-select" onchange="i18n.setLanguage(this.value)" style="background:transparent; color:inherit; border:none; outline:none; cursor:pointer; font-size:0.9rem;">
+                        <option value="fr" style="background:#18191f;">Français</option>
+                        <option value="en" style="background:#18191f;">English</option>
+                    </select>
+                </span>
+                <span data-i18n="version_info">Version 1.0</span>
+            </div>
+        </div>
+    </footer>
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/landing.js"></script>
+</body>
+</html>

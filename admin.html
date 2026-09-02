@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="admin_page_title">Administration - Disque Cloud</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="dashboard mega-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" style="width: 260px;">
+            <div class="sidebar-brand">
+                <div class="mega-logo" style="background: var(--accent); color: white;">A</div> <span class="brand-text">Admin Panel</span>
+            </div>
+            
+            <nav class="sidebar-nav" id="admin-nav">
+                <a href="#" class="nav-item active" data-target="view-dashboard">
+                    <i class="fa-solid fa-chart-pie"></i> <span data-i18n="admin_nav_overview">Vue d'ensemble</span>
+                </a>
+                <a href="#" class="nav-item" data-target="view-users">
+                    <i class="fa-solid fa-users-gear"></i> <span data-i18n="admin_nav_users">Utilisateurs</span>
+                </a>
+                <a href="#" class="nav-item" data-target="view-logs">
+                    <i class="fa-solid fa-list-check"></i> <span data-i18n="admin_nav_logs">Logs d'Activité</span>
+                </a>
+                <a href="#" class="nav-item" data-target="view-settings">
+                    <i class="fa-solid fa-sliders"></i> <span data-i18n="admin_nav_settings">Paramètres</span>
+                </a>
+                <a href="#" class="nav-item" data-target="view-maintenance">
+                    <i class="fa-solid fa-toolbox"></i> <span data-i18n="admin_nav_maintenance">Maintenance</span>
+                </a>
+                <div class="nav-divider"></div>
+                <a href="dashboard.php" class="nav-item">
+                    <i class="fa-solid fa-arrow-left"></i> <span data-i18n="admin_nav_back">Retour au Cloud</span>
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar-mega">
+                <h2 id="admin-page-title" data-i18n="admin_title">Tableau de Bord Administrateur</h2>
+            </header>
+
+            <div class="file-area" style="padding: 2rem; overflow-y: auto;">
+                
+                <!-- VIEW: DASHBOARD -->
+                <div id="view-dashboard" class="admin-view active">
+                    <!-- Stats Row -->
+                    <div style="display: flex; gap: 20px; margin-bottom: 2rem;">
+                        <div style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 20px; border-radius: 12px;">
+                            <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 5px;" data-i18n="admin_stat_users">Utilisateurs Inscrits</div>
+                            <div id="stat-users" style="font-size: 2rem; font-weight: bold; color: var(--accent);">0</div>
+                        </div>
+                        <div style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 20px; border-radius: 12px;">
+                            <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 5px;" data-i18n="admin_stat_files">Fichiers Hébergés</div>
+                            <div id="stat-files" style="font-size: 2rem; font-weight: bold; color: #4ade80;">0</div>
+                        </div>
+                        <div style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 20px; border-radius: 12px;">
+                            <div style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 5px;" data-i18n="admin_stat_storage">Stockage Serveur Utilisé</div>
+                            <div id="stat-storage" style="font-size: 2rem; font-weight: bold; color: #60a5fa;">0 B</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Charts Row -->
+                    <div style="display: flex; gap: 20px;">
+                        <div style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 20px; border-radius: 12px; height: 350px; display: flex; flex-direction: column;">
+                            <h4 style="margin-bottom: 15px; flex-shrink: 0;" data-i18n="admin_chart_plans">Répartition des Plans</h4>
+                            <div style="flex: 1; position: relative; min-height: 0;">
+                                <canvas id="chart-plans"></canvas>
+                            </div>
+                        </div>
+                        <div style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 20px; border-radius: 12px; height: 350px; display: flex; flex-direction: column;">
+                            <h4 style="margin-bottom: 15px; flex-shrink: 0;" data-i18n="admin_chart_storage">Occupation du Stockage</h4>
+                            <div style="flex: 1; position: relative; min-height: 0;">
+                                <canvas id="chart-storage"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- VIEW: USERS -->
+                <div id="view-users" class="admin-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 data-i18n="admin_users_mgmt">Gestion des Utilisateurs</h3>
+                        <div style="display: flex; gap: 10px;">
+                            <select id="admin-filter-status" class="input-control" style="background: rgba(255,255,255,0.05); border: none; color: white;">
+                                <option value="all" style="color: black;" data-i18n="filter_status_all">Tous statuts</option>
+                                <option value="active" style="color: black;" data-i18n="filter_status_active">Actifs</option>
+                                <option value="suspended" style="color: black;" data-i18n="filter_status_suspended">Suspendus</option>
+                            </select>
+                            <select id="admin-filter-plan" class="input-control" style="background: rgba(255,255,255,0.05); border: none; color: white;">
+                                <option value="all" style="color: black;" data-i18n="filter_plan_all">Tous plans</option>
+                                <option value="free" style="color: black;" data-i18n="filter_plan_free">Gratuit</option>
+                                <option value="pro1" style="color: black;" data-i18n="filter_plan_pro1">PRO I</option>
+                                <option value="pro2" style="color: black;" data-i18n="filter_plan_pro2">PRO II</option>
+                            </select>
+                            <div class="search-container" style="margin: 0; min-width: 350px; flex: 1; background: rgba(255,255,255,0.05); border-radius: 20px; padding: 5px 15px; display: flex; align-items: center;">
+                                <i class="fa-solid fa-magnifying-glass" style="color: var(--text-secondary);"></i>
+                                <input type="text" id="admin-search-users" data-i18n-placeholder="admin_search_users_placeholder" placeholder="Rechercher par nom ou email..." style="background: transparent; border: none; color: white; margin-left: 10px; width: 100%; outline: none;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="file-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th data-i18n="col_user">Utilisateur</th>
+                                    <th data-i18n="col_email">Email</th>
+                                    <th data-i18n="col_current_plan">Plan Actuel</th>
+                                    <th data-i18n="col_status">Statut</th>
+                                    <th data-i18n="col_storage">Stockage</th>
+                                    <th data-i18n="col_signup">Inscription</th>
+                                    <th style="text-align: right;" data-i18n="col_actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-users-list">
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- VIEW: LOGS -->
+                <div id="view-logs" class="admin-view" style="display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 data-i18n="admin_activity_logs">Logs d'Activité</h3>
+                        <button id="btn-clear-logs" class="btn btn-primary" style="background: #ef4444; border:none;"><i class="fa-solid fa-trash"></i> <span data-i18n="clear_logs">Vider les logs</span></button>
+                    </div>
+                    <div class="table-container">
+                        <table class="file-table" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th data-i18n="col_date">Date</th>
+                                    <th data-i18n="col_user">Utilisateur</th>
+                                    <th data-i18n="col_action">Action</th>
+                                    <th data-i18n="col_ip">IP</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admin-logs-list">
+                                <!-- Populated via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- VIEW: SETTINGS -->
+                <div id="view-settings" class="admin-view" style="display: none;">
+                    <h3 style="margin-bottom: 20px;" data-i18n="admin_global_settings">Paramètres Globaux</h3>
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 20px; border-radius: 12px; max-width: 600px;">
+                        
+                        <div class="form-group" style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 15px;">
+                            <div>
+                                <label style="font-size: 0.95rem; margin-bottom: 5px; color: var(--text-primary); display:block; font-weight: bold;" data-i18n="admin_allow_reg">Autoriser les nouvelles inscriptions</label>
+                                <span style="font-size: 0.85rem; color: var(--text-secondary);" data-i18n="admin_allow_reg_desc">Permet aux nouveaux visiteurs de créer un compte.</span>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="setting-allow-registration">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                        
+                        <div class="form-group" style="padding-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px;">
+                            <label style="font-size: 0.95rem; margin-bottom: 10px; color: var(--text-primary); display:block; font-weight: bold;" data-i18n="admin_default_quota">Quota de stockage par défaut (Gratuit)</label>
+                            <span style="font-size: 0.85rem; color: var(--text-secondary); display:block; margin-bottom: 10px;" data-i18n="admin_default_quota_desc">En Gigaoctets (Go). Par défaut: 50.</span>
+                            <input type="number" id="setting-default-quota" class="form-control" style="width: 100%; font-size: 0.9rem; padding: 10px; background: rgba(0,0,0,0.2); border: 1px solid var(--border); color: white; border-radius: 6px;">
+                        </div>
+                        
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button class="btn btn-primary" id="btn-save-settings" data-i18n="admin_save_global_settings">Enregistrer les paramètres globaux</button>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 40px; margin-bottom: 20px;" data-i18n="admin_footer_customization">Personnalisation du Footer (Vitrine)</h3>
+                    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border); padding: 20px; border-radius: 12px;">
+                        
+                        <!-- Block General -->
+                        <div style="margin-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">
+                            <h4 style="margin-bottom: 15px; color: var(--accent);" data-i18n="admin_general_social">Général & Réseaux Sociaux</h4>
+                            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                                <div style="flex: 1; min-width: 250px;">
+                                    <label style="display:block; margin-bottom:5px; font-size:0.9rem;" data-i18n="admin_presentation_text">Texte de présentation</label>
+                                    <textarea id="footer-desc" class="input-control" rows="4"></textarea>
+                                    
+                                    <label style="display:block; margin-bottom:5px; margin-top:15px; font-size:0.9rem;" data-i18n="admin_copyright">Copyright</label>
+                                    <input type="text" id="footer-copyright" class="input-control">
+                                </div>
+                                <div style="flex: 1; min-width: 250px;">
+                                    <label style="display:block; margin-bottom:5px; font-size:0.9rem;">Twitter URL</label>
+                                    <input type="text" id="footer-twitter" class="input-control" placeholder="https://...">
+                                    
+                                    <label style="display:block; margin-bottom:5px; margin-top:10px; font-size:0.9rem;">Facebook URL</label>
+                                    <input type="text" id="footer-facebook" class="input-control" placeholder="https://...">
+                                    
+                                    <label style="display:block; margin-bottom:5px; margin-top:10px; font-size:0.9rem;">Github URL</label>
+                                    <input type="text" id="footer-github" class="input-control" placeholder="https://...">
+                                    
+                                    <label style="display:block; margin-bottom:5px; margin-top:10px; font-size:0.9rem;">Instagram URL</label>
+                                    <input type="text" id="footer-instagram" class="input-control" placeholder="https://...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Block Lists -->
+                        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 30px;">
+                            <div style="flex: 1; min-width: 250px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                                <h4 style="margin-bottom: 15px;" data-i18n="admin_legal_col">Colonne "Légal"</h4>
+                                <div id="footer-legal-container"></div>
+                                <button class="btn btn-secondary" id="btn-add-legal" style="margin-top:10px; width:100%;"><i class="fa-solid fa-plus"></i> <span data-i18n="admin_add_link">Ajouter un lien</span></button>
+                            </div>
+                            <div style="flex: 1; min-width: 250px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px;">
+                                <h4 style="margin-bottom: 15px;" data-i18n="admin_support_col">Colonne "Support"</h4>
+                                <div id="footer-support-container"></div>
+                                <button class="btn btn-secondary" id="btn-add-support" style="margin-top:10px; width:100%;"><i class="fa-solid fa-plus"></i> <span data-i18n="admin_add_link">Ajouter un lien</span></button>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end;">
+                            <button class="btn btn-primary" id="btn-save-footer" data-i18n="admin_save_footer">Enregistrer le Footer</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- VIEW: MAINTENANCE -->
+                <div id="view-maintenance" class="admin-view" style="display: none;">
+                    <h3 style="margin-bottom: 20px;" data-i18n="admin_maintenance">Santé et Maintenance</h3>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                        <!-- Server Info -->
+                        <div class="glass-panel" style="padding: 20px; border-radius: 12px; background: rgba(0,0,0,0.2);">
+                            <h4 style="margin-bottom: 15px; color: var(--accent);"><i class="fa-solid fa-server"></i> Informations Serveur</h4>
+                            <table style="width: 100%; font-size: 0.95rem; color: var(--text-secondary);">
+                                <tr><td style="padding: 5px 0;" data-i18n="admin_os">Système (OS):</td><td id="maint-os" style="text-align: right; font-weight: bold; color: white;">-</td></tr>
+                                <tr><td style="padding: 5px 0;" data-i18n="admin_web_server">Serveur Web (ex: LiteSpeed/Apache):</td><td id="maint-software" style="text-align: right; font-weight: bold; color: white;">-</td></tr>
+                                <tr><td style="padding: 5px 0;" data-i18n="admin_mysql_version">Version MySQL:</td><td id="maint-mysql" style="text-align: right; font-weight: bold; color: white;">-</td></tr>
+                                <tr><td style="padding: 5px 0;" data-i18n="admin_php_version_label">Version PHP:</td><td id="maint-php-version" style="text-align: right; font-weight: bold; color: white;">-</td></tr>
+                                <tr><td style="padding: 5px 0;" data-i18n="admin_php_memory">Limite Mémoire PHP:</td><td id="maint-mem-limit" style="text-align: right; font-weight: bold; color: white;">-</td></tr>
+                                <tr><td style="padding: 5px 0;" data-i18n="admin_php_upload">Max Upload PHP:</td><td id="maint-upload-max" style="text-align: right; font-weight: bold; color: white;">-</td></tr>
+                                <tr><td style="padding: 5px 0; border-top: 1px solid rgba(255,255,255,0.1); margin-top:5px;" data-i18n="admin_db_size">Taille Base de données:</td><td id="maint-db-size" style="text-align: right; font-weight: bold; color: #4ade80; border-top: 1px solid rgba(255,255,255,0.1); margin-top:5px;">-</td></tr>
+                                <tr><td style="padding: 5px 0;" data-i18n="admin_disk_free">Espace Disque Libre:</td><td id="maint-disk-free" style="text-align: right; font-weight: bold; color: #4ade80;">-</td></tr>
+                            </table>
+                        </div>
+                        
+                        <!-- Actions -->
+                        <div class="glass-panel" style="padding: 20px; border-radius: 12px; background: rgba(0,0,0,0.2);">
+                            <h4 style="margin-bottom: 15px; color: #4ade80;"><i class="fa-solid fa-broom"></i> <span data-i18n="admin_clean_actions">Actions de Nettoyage</span></h4>
+                            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;" data-i18n="admin_clean_desc">Le nettoyage orphelin scanne le dossier uploads/ et supprime les fichiers qui ne sont plus référencés dans la base de données.</p>
+                            <button id="btn-clean-orphans" class="btn btn-primary" style="background: #eab308; color: black; border: none; width: 100%;"><i class="fa-solid fa-broom"></i> <span data-i18n="admin_clean_btn">Lancer le nettoyage</span></button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Upgrade User Modal -->
+    <div class="modal-overlay" id="modal-admin-upgrade">
+        <div class="modal" style="max-width: 400px; padding: 2rem;">
+            <h3 data-i18n="admin_upgrade_user">Surclasser l'utilisateur</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 20px;"><span data-i18n="admin_upgrade_desc">Choisissez un nouveau plan pour</span> <strong id="upgrade-username-target"></strong>.</p>
+            
+            <input type="hidden" id="upgrade-user-id">
+            <div class="input-group">
+                <label data-i18n="plan">Plan</label>
+                <select id="upgrade-plan-select" class="input-control">
+                    <option value="free" data-i18n="plan_free_50">Gratuit (50 Go)</option>
+                    <option value="pro1" data-i18n="plan_pro1">PRO I (2 To)</option>
+                    <option value="pro2" data-i18n="plan_pro2">PRO II (8 To)</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button class="btn btn-secondary" id="cancel-upgrade-modal" style="flex: 1;" data-i18n="cancel">Annuler</button>
+                <button class="btn btn-primary" id="submit-upgrade" style="flex: 1;" data-i18n="save">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Details Modal -->
+    <div class="modal-overlay" id="modal-admin-user-details">
+        <div class="modal" style="max-width: 500px; padding: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 data-i18n="admin_user_details">Détails de l'utilisateur</h3>
+                <button id="close-user-details" style="background:none; border:none; color:var(--text-secondary); cursor:pointer; font-size: 1.2rem;"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+                <div id="details-avatar" style="width: 60px; height: 60px; border-radius: 50%; background-color: #374151; background-size: cover; background-position: center;"></div>
+                <div>
+                    <h4 id="details-username" style="margin: 0; font-size: 1.2rem;"></h4>
+                    <div id="details-email" style="color: var(--text-secondary); font-size: 0.9rem;"></div>
+                </div>
+            </div>
+            
+            <table style="width: 100%; font-size: 0.9rem; color: var(--text-secondary);" id="details-table">
+                <!-- Dynamically populated -->
+            </table>
+            
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <h5 style="margin-bottom: 10px; color: var(--accent);" data-i18n="admin_custom_quota">Modifier le Quota Personnalisé</h5>
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="details-custom-quota" class="input-control" data-i18n-placeholder="admin_quota_gb" placeholder="Quota en Go" style="flex: 1;">
+                    <button id="btn-save-quota" class="btn btn-primary" data-i18n="admin_save">Sauvegarder</button>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1);">
+                <h5 style="margin-bottom: 10px; color: #ef4444;" data-i18n="admin_force_password">Forcer le mot de passe</h5>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="details-new-password" class="input-control" data-i18n-placeholder="admin_new_password" placeholder="Nouveau mot de passe" style="flex: 1;">
+                    <button id="btn-save-password" class="btn btn-primary" style="background: #ef4444; border:none;" data-i18n="admin_apply">Appliquer</button>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: right;">
+                <button class="btn btn-primary" id="btn-details-close" data-i18n="close">Fermer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <span id="notif-message"></span>
+    </div>
+
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/admin.js"></script>
+</body>
+</html>

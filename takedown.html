@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="takedown_page_title">Politique de Retrait (Takedown) - Mega Clone</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .page-header { background: var(--bg-secondary); padding: 6rem 10% 2rem; border-bottom: 1px solid var(--border); }
+        .page-title { font-size: 2.5rem; color: white; margin-bottom: 1rem; }
+        .page-content { padding: 4rem 10%; max-width: 900px; margin: 0 auto; color: var(--text-secondary); line-height: 1.8; }
+        .page-content h2 { color: white; margin-top: 2rem; margin-bottom: 1rem; }
+        .page-content p { margin-bottom: 1.5rem; }
+        .page-content ul { margin-bottom: 1.5rem; padding-left: 20px; }
+        .page-content li { margin-bottom: 0.5rem; }
+        .alert-box { background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 20px; border-radius: 8px; color: #ef4444; margin-bottom: 2rem; }
+    </style>
+</head>
+<body class="landing-page">
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <a href="index.html" style="color:white; text-decoration:none;"><i class="fa-solid fa-cloud"></i> MEGA CLONE</a>
+            </div>
+            <div class="navbar-actions">
+                <a href="index.html" class="btn btn-secondary" data-i18n="back_to_home">Retour à l'accueil</a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <h1 class="page-title" data-i18n="takedown_title">Politique de Retrait (Takedown Guidance)</h1>
+    </header>
+
+    <main class="page-content">
+        <div class="alert-box">
+            <i class="fa-solid fa-triangle-exclamation"></i> <strong data-i18n="takedown_alert_strong">Avertissement important :</strong> <span data-i18n="takedown_alert_text">Étant donné notre architecture Zéro Connaissance, nous ne pouvons pas scanner, lire ou rechercher des fichiers par leur nom ou leur contenu au sein des comptes utilisateurs.</span>
+        </div>
+
+        <h2 data-i18n="takedown_h2_1">Procédure de signalement</h2>
+        <p data-i18n="takedown_p_1">Mega Clone respecte la propriété intellectuelle d'autrui. Si vous pensez qu'un fichier partagé publiquement via notre plateforme enfreint vos droits d'auteur, vous pouvez soumettre une demande de retrait (DMCA / Takedown Request).</p>
+        
+        <p data-i18n="takedown_p_2">Votre demande doit obligatoirement inclure :</p>
+        <ul>
+            <li data-i18n="takedown_li_1">L'URL publique (le lien de partage) exacte générée par Mega Clone.</li>
+            <li data-i18n="takedown_li_2">La clé de déchiffrement associée (si elle est incluse dans l'URL ou partagée séparément), afin que nous puissions vérifier l'infraction.</li>
+            <li data-i18n="takedown_li_3">Une déclaration sous serment indiquant que vous êtes le propriétaire légitime des droits ou autorisé à agir en son nom.</li>
+        </ul>
+
+        <h2 data-i18n="takedown_h2_2">Action suite au signalement</h2>
+        <p data-i18n="takedown_p_3">Une fois le lien et la clé fournis, si l'infraction est avérée, nous procéderons à la suppression immédiate du fichier de nos serveurs. Les comptes générant un nombre excessif de plaintes justifiées seront définitivement suspendus.</p>
+    </main>
+
+    <!-- Footer Pro -->
+    <footer class="footer-pro" style="background: #18191f; padding: 4rem 10% 2rem; border-top: 1px solid var(--border);">
+        <div style="display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between; margin-bottom: 3rem;">
+            <div style="flex: 1; min-width: 250px;">
+                <div class="navbar-brand" style="margin-bottom: 1rem; color: white; font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-cloud" style="color: var(--accent);"></i> MEGA CLONE
+                </div>
+                <p id="pub-footer-desc" style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;"></p>
+                <div style="display: flex; gap: 15px;">
+                    <a href="#" id="pub-footer-twitter" style="color: var(--text-secondary); font-size: 1.2rem;" class="footer-icon-link"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" id="pub-footer-facebook" style="color: var(--text-secondary); font-size: 1.2rem;" class="footer-icon-link"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" id="pub-footer-github" style="color: var(--text-secondary); font-size: 1.2rem;" class="footer-icon-link"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" id="pub-footer-instagram" style="color: var(--text-secondary); font-size: 1.2rem;" class="footer-icon-link"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+            <div style="display: flex; flex-wrap: wrap; gap: 40px; flex: 2; min-width: 300px; justify-content: flex-end;">
+                <div style="min-width: 150px;">
+                    <h4 style="color: white; margin-bottom: 1.5rem; font-size: 1.1rem;" data-i18n="footer_legal">Légal</h4>
+                    <ul id="pub-footer-legal" style="list-style: none; padding: 0;"></ul>
+                </div>
+                <div style="min-width: 150px;">
+                    <h4 style="color: white; margin-bottom: 1.5rem; font-size: 1.1rem;" data-i18n="footer_support">Support</h4>
+                    <ul id="pub-footer-support" style="list-style: none; padding: 0;"></ul>
+                </div>
+            </div>
+        </div>
+        <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; color: var(--text-secondary); font-size: 0.9rem;">
+            <p id="pub-footer-copyright"></p>
+            <div style="display: flex; gap: 20px;">
+                <span>
+                    <i class="fa-solid fa-earth-europe"></i>
+                    <select class="lang-switcher-select" onchange="i18n.setLanguage(this.value)" style="background:transparent; color:inherit; border:none; outline:none; cursor:pointer; font-size:0.9rem;">
+                        <option value="fr" style="background:#18191f;">Français</option>
+                        <option value="en" style="background:#18191f;">English</option>
+                    </select>
+                </span>
+                <span data-i18n="version_info">Version 1.0</span>
+            </div>
+        </div>
+    </footer>
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/landing.js"></script>
+</body>
+</html>

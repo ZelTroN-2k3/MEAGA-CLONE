@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="account_page_title">Tableau de bord - Mega Clone</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .account-layout {
+            display: flex;
+            height: 100vh;
+            background: #191b22;
+            color: white;
+            font-family: 'Inter', sans-serif;
+        }
+        
+        /* Account Sidebar */
+        .account-sidebar {
+            width: 260px;
+            background: #252830;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #2d313c;
+        }
+        .account-profile-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px 20px 20px;
+            border-bottom: 1px solid #2d313c;
+        }
+        .account-avatar {
+            width: 80px;
+            height: 80px;
+            background: url('https://ui-avatars.com/api/?name=User&background=333&color=fff') center/cover;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            background-color: #333;
+            margin-bottom: 15px;
+        }
+        .account-name {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .account-email {
+            font-size: 0.85rem;
+            color: #aeb4c0;
+            margin-bottom: 15px;
+        }
+        .account-plan-badge {
+            background: #2d313c;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .account-plan-badge i { color: #33cc33; }
+        
+        .account-member-since {
+            padding: 20px;
+            font-size: 0.85rem;
+            color: #aeb4c0;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #2d313c;
+        }
+        
+        .account-sidebar-nav {
+            padding: 20px 0;
+        }
+        .account-nav-item {
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+        .account-nav-item:hover { background: #2d313c; }
+        .account-nav-item i { color: #ffcc00; font-size: 1.2rem; }
+
+        /* Main Content */
+        .account-main {
+            flex: 1;
+            padding: 40px 60px;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        /* Top Navigation right icons */
+        .account-top-icons {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            display: flex;
+            gap: 20px;
+            font-size: 1.2rem;
+            color: #aeb4c0;
+        }
+        .account-top-icons i { cursor: pointer; }
+        .account-top-icons i:hover { color: white; }
+        
+        .welcome-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .welcome-title i { color: #ffcc00; }
+
+        /* Cards */
+        .dashboard-card {
+            background: #1e2029;
+            border: 1px solid #2d313c;
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .storage-summary-row {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+        .chart-circle {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 4px solid #2d313c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        .chart-circle.active { border-color: #4d4dff; border-top-color: #2d313c; border-right-color: #2d313c; transform: rotate(-45deg);}
+        .chart-circle.active span { transform: rotate(45deg); }
+        
+        .stat-block { display: flex; align-items: center; gap: 15px; }
+        .stat-info { display: flex; flex-direction: column; gap: 5px; }
+        .stat-title { font-weight: bold; font-size: 0.95rem; }
+        .stat-val { font-size: 0.85rem; color: #aeb4c0; }
+        .stat-val strong { color: #33cc33; }
+        
+        .btn-upgrade-large {
+            background: #46c78c;
+            color: #191b22;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            margin-left: auto;
+            cursor: pointer;
+        }
+        .btn-upgrade-large:hover { background: #3eb57c; }
+
+        .card-header-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 25px;
+        }
+
+        /* Detailed Storage Bar */
+        .detailed-storage-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        .ds-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .ds-pct { font-size: 1.5rem; font-weight: bold; }
+        .ds-pct span { font-size: 0.8rem; color: #aeb4c0; font-weight: normal; margin-left: 5px; }
+        .ds-label { font-size: 0.85rem; display: flex; align-items: center; gap: 8px; }
+        .ds-label .dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        .full-bar {
+            width: 100%;
+            height: 6px;
+            background: #2d313c;
+            border-radius: 3px;
+            display: flex;
+            overflow: hidden;
+        }
+        .full-bar-segment { height: 100%; }
+
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-table td {
+            padding: 15px 0;
+            border-bottom: 1px solid #2d313c;
+            font-size: 0.85rem;
+            color: #aeb4c0;
+        }
+        .data-table td:first-child { color: white; display: flex; align-items: center; gap: 15px; }
+        .data-table td:last-child { text-align: right; }
+        .data-table tr:last-child td { border-bottom: none; }
+        
+        /* Tabs */
+        .account-tabs {
+            display: flex;
+            gap: 30px;
+            margin-top: 10px;
+            margin-bottom: 25px;
+            border-bottom: 1px solid #2d313c;
+        }
+        .account-tab {
+            padding: 10px 0;
+            color: #aeb4c0;
+            cursor: pointer;
+            font-weight: 600;
+            position: relative;
+        }
+        .account-tab.active {
+            color: white;
+        }
+        .account-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: #46c78c;
+            border-radius: 3px 3px 0 0;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* Form */
+        .profile-form-group {
+            margin-bottom: 20px;
+        }
+        .profile-form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aeb4c0;
+            font-size: 0.9rem;
+        }
+        .profile-form-group input {
+            width: 100%;
+            background: #191b22;
+            border: 1px solid #2d313c;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        .btn-save {
+            background: #46c78c;
+            color: #191b22;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-save:hover { background: #3eb57c; }
+        
+        .billing-card {
+            background: #191b22;
+            border: 1px solid #2d313c;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="account-layout">
+        <!-- Sidebar -->
+        <div class="account-sidebar">
+            <div class="account-profile-header">
+                <div class="account-avatar" id="acc-avatar">U</div>
+                <div class="account-name" id="acc-name">Utilisateur</div>
+                <div class="account-email">utilisateur@megaclone.net</div>
+                <div class="account-plan-badge">
+                    <i class="fa-solid fa-shield-halved"></i> <span id="acc-plan-badge-text">FREE</span>
+                </div>
+            </div>
+            
+            <div class="account-member-since">
+                <span data-i18n="account_member_since">Membre depuis :</span>
+                <span id="acc-date">...</span>
+            </div>
+            
+            <div class="account-sidebar-nav">
+                <a href="#" class="account-nav-item" id="btn-export-key">
+                    <i class="fa-solid fa-key"></i> <span data-i18n="account_export_key">Exporter la clé de récupération</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="account-main">
+            <div class="account-top-icons">
+                <i class="fa-solid fa-grip" onclick="window.location.href='dashboard.php'" title="Retour au Disque Cloud" style="color: white;"></i>
+                <i class="fa-solid fa-user-group"></i>
+                
+                <!-- Notifications -->
+                <!-- Notifications -->
+                <div class="notification-bell-container" id="btn-notifications" style="display:inline-block;">
+                    <i class="fa-regular fa-bell"></i>
+                    <div class="notification-badge" id="notif-badge">0</div>
+                    
+                    <div class="notifications-dropdown" id="notif-dropdown">
+                        <div class="notifications-header">
+                            <div class="notif-title-container" id="notif-filter-toggle">
+                                <span id="notif-current-filter" data-i18n="topbar_notif_all">Toutes les notifications</span>
+                                <i class="fa-solid fa-chevron-down" style="font-size: 0.8rem; margin-left: 5px;"></i>
+                            </div>
+                            <i class="fa-solid fa-gear" id="notif-settings-btn" title="Paramètres des notifications" style="cursor: pointer; color: var(--text-secondary); transition: color 0.2s;"></i>
+                            
+                            <!-- Filter Dropdown Menu (Hidden by default) -->
+                            <div class="notif-filter-menu" id="notif-filter-menu" style="display: none;">
+                                <div class="notif-filter-item active" data-filter="all" data-i18n="topbar_notif_all">Toutes les notifications</div>
+                                <div class="notif-filter-item" data-filter="cloud" data-i18n="topbar_notif_cloud">Disque Cloud</div>
+                                <div class="notif-filter-item" data-filter="chat" data-i18n="topbar_notif_chat">Chat et réunions</div>
+                                <div class="notif-filter-item" data-filter="contacts" data-i18n="topbar_notif_contacts">Contacts</div>
+                                <div class="notif-filter-item" data-filter="account" data-i18n="topbar_notif_account">Compte</div>
+                            </div>
+                        </div>
+                        
+                        <div class="notifications-list" id="notif-list">
+                            <!-- JS injected -->
+                        </div>
+                        
+                        <div class="notifications-empty" id="notif-empty" style="display: none; padding: 40px 20px; text-align: center;">
+                            <div class="notif-empty-icon">
+                                <i class="fa-solid fa-inbox" style="font-size: 3.5rem; color: #a1a1aa; margin-bottom: 20px;"></i>
+                            </div>
+                            <h4 style="margin: 0 0 10px 0; color: white; font-size: 1.1rem;" data-i18n="notif_empty_title">Rien de neuf</h4>
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.85rem;" data-i18n="notif_empty_desc">Vous n'avez pas de nouvelles notifications pour le moment</p>
+                        </div>
+                        
+                        <div style="padding: 10px 15px; border-top: 1px solid rgba(255,255,255,0.05); text-align: center; display: none;" id="notif-mark-all-container">
+                            <div class="notifications-mark-read" id="notif-mark-all" data-i18n="topbar_notif_mark_read">Tout marquer comme lu</div>
+                        </div>
+            
+                    </div>
+                </div>
+
+                <i class="fa-solid fa-circle-user"></i>
+            </div>
+            
+            <div class="welcome-title">
+                <i class="fa-solid fa-sun"></i> <span data-i18n="account_hello">Bonjour</span>, <span id="acc-welcome-name">Utilisateur</span>.
+            </div>
+            
+            <div class="account-tabs">
+                <div class="account-tab active" id="tab-btn-storage" onclick="switchTab('storage')" data-i18n="account_tab_storage">Stockage & Données</div>
+                <div class="account-tab" id="tab-btn-profile" onclick="switchTab('profile')" data-i18n="account_tab_profile">Profil & Facturation</div>
+                <div class="account-tab" id="tab-btn-notifications" onclick="switchTab('notifications')" data-i18n="account_tab_notifications">Notifications</div>
+            </div>
+            
+            <!-- STORAGE TAB -->
+            <div id="tab-storage" class="tab-content active">
+            
+            <div class="dashboard-card storage-summary-row">
+                <div class="stat-block">
+                    <div class="chart-circle active"><span id="circ-pct">0%</span></div>
+                    <div class="stat-info">
+                        <div class="stat-title" data-i18n="account_stat_storage">Stockage</div>
+                        <div class="stat-val"><strong id="val-used">0 o</strong> / <span id="val-total">50 Go</span></div>
+                    </div>
+                </div>
+                
+                <div style="width: 1px; height: 50px; background: #2d313c; margin: 0 20px;"></div>
+                
+                <div class="stat-block">
+                    <div class="chart-circle"><span>---</span></div>
+                    <div class="stat-info">
+                        <div class="stat-title" data-i18n="account_stat_transfer">Transfert</div>
+                        <div class="stat-val"><strong>0 ko</strong> <span data-i18n="account_transfer_used">utilisés</span></div>
+                    </div>
+                </div>
+                
+                <button class="btn-upgrade-large" id="btn-upgrade-main" data-i18n="account_btn_upgrade">Surclasser le compte</button>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header-title" data-i18n="account_storage_used_title">Espace de stockage utilisé</div>
+                
+                <div class="detailed-storage-stats">
+                    <div class="ds-item">
+                        <div class="ds-pct" id="pct-cloud">0% <span>[0 Go]</span></div>
+                        <div class="ds-label"><div class="dot" style="background:#4d4dff;"></div> <span data-i18n="account_ds_cloud">Disque Cloud</span></div>
+                    </div>
+                    <div class="ds-item">
+                        <div class="ds-pct">0% <span>[0 o]</span></div>
+                        <div class="ds-label"><div class="dot" style="background:#ffa64d;"></div> <span data-i18n="account_ds_versions">Versions</span></div>
+                    </div>
+                    <div class="ds-item">
+                        <div class="ds-pct" id="pct-trash">0% <span>[0 o]</span></div>
+                        <div class="ds-label"><div class="dot" style="background:#ff4d4d;"></div> <span data-i18n="account_ds_trash">Corbeille</span></div>
+                    </div>
+                    <div class="ds-item">
+                        <div class="ds-pct" id="pct-free">100% <span>[50 Go]</span></div>
+                        <div class="ds-label"><div class="dot" style="background:#aeb4c0;"></div> <span data-i18n="account_ds_free">Libre</span></div>
+                    </div>
+                </div>
+                
+                <div class="full-bar">
+                    <div class="full-bar-segment" id="bar-cloud" style="width: 0%; background: #4d4dff;"></div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card">
+                <div class="card-header-title" data-i18n="account_data_title">Données</div>
+                <table class="data-table">
+                    <tr>
+                        <td><i class="fa-regular fa-file"></i> <span data-i18n="account_data_all_files">Tous les fichiers</span></td>
+                        <td id="data-files-count">0 fichiers</td>
+                        <td id="data-files-size">0 Go</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-regular fa-folder"></i> <span data-i18n="account_data_all_folders">Tous les dossiers</span></td>
+                        <td id="data-folders-count">0 dossiers</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-regular fa-trash-can"></i> <span data-i18n="account_data_trash">Corbeille</span></td>
+                        <td id="data-trash-count">-</td>
+                        <td id="data-trash-size">-</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-arrow-right-to-bracket"></i> <span data-i18n="account_data_incoming">Partages entrants</span></td>
+                        <td data-i18n="account_0_folder">0 dossier</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-arrow-right-from-bracket"></i> <span data-i18n="account_data_outgoing">Partages sortants</span></td>
+                        <td data-i18n="account_0_folder">0 dossier</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-link"></i> <span data-i18n="account_data_links">Liens</span></td>
+                        <td>0</td>
+                        <td>-</td>
+                    </tr>
+                </table>
+                </table>
+            </div>
+            </div> <!-- End Storage Tab -->
+
+            <!-- PROFILE TAB -->
+            <div id="tab-profile" class="tab-content">
+                <div class="dashboard-card">
+                    <div class="card-header-title" data-i18n="account_personal_info">Informations Personnelles</div>
+                    <form id="profile-form">
+                        <div style="display:flex; gap:20px; margin-bottom: 15px;">
+                            <div class="profile-form-group" style="flex:1;">
+                                <label data-i18n="account_first_name">Prénom</label>
+                                <input type="text" id="input-first-name" data-i18n-placeholder="account_first_name_ph" placeholder="Votre prénom">
+                            </div>
+                            <div class="profile-form-group" style="flex:1;">
+                                <label data-i18n="account_last_name">Nom</label>
+                                <input type="text" id="input-last-name" data-i18n-placeholder="account_last_name_ph" placeholder="Votre nom">
+                            </div>
+                        </div>
+                        <div style="display:flex; gap:20px;">
+                            <div class="profile-form-group" style="flex:1;">
+                                <label data-i18n="account_birth_date">Date de naissance</label>
+                                <input type="date" id="input-birth-date" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: white;">
+                            </div>
+                            <div class="profile-form-group" style="flex:1;">
+                                <label data-i18n="account_country">Pays</label>
+                                <input type="text" id="input-country" data-i18n-placeholder="account_country_ph" placeholder="Votre pays" style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid var(--border); background: rgba(0,0,0,0.2); color: white;">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn-save" data-i18n="account_btn_save">Enregistrer les modifications</button>
+                        <span id="profile-msg" style="margin-left:15px; color:#46c78c; font-size:0.9rem; display:none;" data-i18n="account_profile_updated">Profil mis à jour !</span>
+                    </form>
+                </div>
+                
+                <div class="dashboard-card" style="margin-top: 20px;">
+                    <div class="card-header-title" data-i18n="account_plan_billing">Plan & Facturation</div>
+                    <div class="billing-card">
+                        <div>
+                            <div style="font-size: 1.2rem; font-weight: bold; margin-bottom: 5px;"><span data-i18n="account_current_plan">Plan actuel :</span> <span id="bill-plan-name" style="color: #46c78c;">FREE</span></div>
+                            <div style="color: #aeb4c0; font-size: 0.9rem; margin-bottom: 15px;"><i class="fa-regular fa-credit-card"></i> <span data-i18n="account_payment_method">Moyen de paiement :</span> <span id="bill-payment" data-i18n="account_payment_none">Aucun</span></div>
+                            <div style="color: #6c707d; font-size: 0.8rem;" data-i18n="account_billing_info">Facturation mensuelle. Prochain prélèvement : N/A</div>
+                        </div>
+                        <button class="btn-upgrade-large" style="margin: 0;" id="btn-upgrade-billing" data-i18n="account_btn_upgrade">Surclasser le compte</button>
+                    </div>
+                </div>
+
+                <div class="dashboard-card" style="margin-top: 20px; border: 1px solid #ef4444;">
+                    <div class="card-header-title" style="color: #ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> <span data-i18n="account_delete_title">Supprimer le compte</span></div>
+                    <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 15px;" data-i18n="account_delete_warning">Avertissement : Après avoir confirmé cette action, vous ne pourrez ni accéder aux données de votre compte, ni à vos contacts, ni à vos conversations sur MEGA CLONE.</p>
+                    <button id="btn-delete-account" class="btn-upgrade-large" style="margin: 0; background: #ef4444; border-color: #ef4444;"><i class="fa-solid fa-trash"></i> <span data-i18n="account_btn_delete">Supprimer le compte</span></button>
+                </div>
+            </div> <!-- End Profile Tab -->
+
+            <!-- NOTIFICATIONS TAB -->
+            <div id="tab-notifications" class="tab-content">
+                <div class="dashboard-card" style="padding: 40px;">
+                    <!-- Notifications du compte -->
+                    <div class="account-notif-section" style="display: flex;">
+                        <div style="width: 250px; font-weight: bold; font-size: 1.1rem; color: white;" data-i18n="notif_sec_account">Notifications du compte</div>
+                        <div style="flex: 1;">
+                            <div class="account-notif-row" style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                <div class="account-notif-label" data-i18n="notif_act_all_acc">Activer toutes les notifications du compte</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="ns-acc-all" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            
+                            <h5 style="margin: 20px 0 10px 0; color: #e5e7eb; font-size: 0.95rem;" data-i18n="notif_cat_cloud">Disque Cloud</h5>
+                            <div class="account-notif-row">
+                                <div class="account-notif-label" data-i18n="notif_cloud_1">Nouveau dossier partagé d'un contact</div>
+                                <label class="toggle-switch"><input type="checkbox" class="ns-acc-child" id="ns-acc-c1" checked><span class="slider round"></span></label>
+                            </div>
+                            <div class="account-notif-row">
+                                <div class="account-notif-label" data-i18n="notif_cloud_2">L'accès à un dossier partagé a été supprimé</div>
+                                <label class="toggle-switch"><input type="checkbox" class="ns-acc-child" id="ns-acc-c2" checked><span class="slider round"></span></label>
+                            </div>
+                            <div class="account-notif-row">
+                                <div class="account-notif-label" data-i18n="notif_cloud_3">Un contact a ajouté des fichiers à un dossier partagé</div>
+                                <label class="toggle-switch"><input type="checkbox" class="ns-acc-child" id="ns-acc-c3" checked><span class="slider round"></span></label>
+                            </div>
+                            <div class="account-notif-row">
+                                <div class="account-notif-label" data-i18n="notif_cloud_4">Éléments téléversés vers une demande de fichiers</div>
+                                <label class="toggle-switch"><input type="checkbox" class="ns-acc-child" id="ns-acc-c4" checked><span class="slider round"></span></label>
+                            </div>
+                            
+                            <h5 style="margin: 20px 0 10px 0; color: #e5e7eb; font-size: 0.95rem;" data-i18n="notif_cat_chat">Dialogue en ligne et réunions</h5>
+                            <div class="account-notif-row" style="border: none;">
+                                <div class="account-notif-label" data-i18n="notif_chat_1">Notifications de bureau</div>
+                                <label class="toggle-switch"><input type="checkbox" class="ns-acc-child" id="ns-acc-chat1" checked><span class="slider round"></span></label>
+                            </div>
+                            <div class="notif-info-box">
+                                <p style="margin: 0;" data-i18n="notif_chat_info">Pour recevoir les notifications de MEGA sur votre bureau, vous devez les activer à la fois dans les paramètres de votre système et dans votre navigateur.</p>
+                            </div>
+                            
+                            <h5 style="margin: 30px 0 10px 0; color: #e5e7eb; font-size: 0.95rem;" data-i18n="notif_cat_contacts">Contacts</h5>
+                            <div class="account-notif-row">
+                                <div class="account-notif-label" data-i18n="notif_cont_1">Quelqu'un vous a envoyé une demande de contact</div>
+                                <label class="toggle-switch"><input type="checkbox" class="ns-acc-child" id="ns-acc-cont1" checked><span class="slider round"></span></label>
+                            </div>
+                            <div class="account-notif-row">
+                                <div class="account-notif-label" data-i18n="notif_cont_2">Quelqu'un a accepté votre demande de contact</div>
+                                <label class="toggle-switch"><input type="checkbox" class="ns-acc-child" id="ns-acc-cont2" checked><span class="slider round"></span></label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr style="border-color: rgba(255,255,255,0.05); margin: 40px 0;">
+                    
+                    <!-- Notifications par courriel -->
+                    <div class="account-notif-section" style="display: flex;">
+                        <div style="width: 250px;">
+                            <div style="font-weight: bold; font-size: 1.1rem; color: white; margin-bottom: 10px;" data-i18n="notif_sec_email">Notifications par courriel</div>
+                            <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 20px;" data-i18n="notif_sec_email_desc">MEGA vous envoie des courriels occasionnellement afin de vous informer de l'état de votre compte. Vous pouvez choisir de ne plus recevoir certains courriels de notification.</p>
+                            <div class="notif-info-box">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <span style="font-size: 0.75rem;" data-i18n="notif_sec_email_info">Les courriels d'avertissement essentiels ne peuvent pas être désactivés.</span>
+                            </div>
+                        </div>
+                        <div style="flex: 1;">
+                            <div class="account-notif-row" style="border-bottom: 2px solid rgba(255,255,255,0.1);">
+                                <div class="account-notif-label" data-i18n="notif_act_all_email">Activer toutes les notifications par courriel</div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="ns-email-all" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                            
+                            <h5 style="margin: 20px 0 10px 0; color: #e5e7eb; font-size: 0.95rem;" data-i18n="notif_cat_contacts">Contacts</h5>
+                            <div class="account-notif-row">
+                                <div class="account-notif-label" data-i18n="notif_cont_1">Quelqu'un vous a envoyé une demande de contact</div>
+                                <label class="toggle-switch"><input type="checkbox" class="ns-email-child" id="ns-em-cont1" checked><span class="slider round"></span></label>
+                            </div>
+                            
+                            <h5 style="margin: 20px 0 10px 0; color: #e5e7eb; font-size: 0.95rem;" data-i18n="notif_cat_chat">Dialogue en ligne</h5>
+                            <div class="account-notif-row">
+                                <div class="account-notif-label" data-i18n="notif_chat_email_1">Quelqu'un vous a envoyé un message dans une conversation</div>
+                                <label class="toggle-switch"><input type="checkbox" class="ns-email-child" id="ns-em-chat1" checked><span class="slider round"></span></label>
+                            </div>
+                            
+                            <h5 style="margin: 20px 0 10px 0; color: #e5e7eb; font-size: 0.95rem;" data-i18n="notif_cat_quota">Avertissements sur le quota d'espace de stockage</h5>
+                            <div class="account-notif-row" style="border: none;">
+                                <div class="account-notif-label" data-i18n="notif_quota_1">Avertissements de dépassement proche du quota</div>
+                                <label class="toggle-switch"><input type="checkbox" class="ns-email-child" id="ns-em-quota1" checked><span class="slider round"></span></label>
+                            </div>
+                            <div class="notif-info-box">
+                                <i class="fa-solid fa-circle-info"></i>
+                                <span style="font-size: 0.75rem;" data-i18n="notif_quota_info">Remarque : Un avertissement sera toujours envoyé si vous dépassez votre quota.</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div style="text-align: right; margin-top: 20px;">
+                    <button class="btn btn-primary" id="btn-save-notif-settings" data-i18n="save">Enregistrer</button>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+    
+    <!-- Recovery Modal -->
+    <div class="modal-overlay" id="modal-recovery">
+        <div class="modal modal-recovery">
+            <div class="modal-header" style="justify-content: flex-end; margin-bottom: 0;">
+                <i class="fa-solid fa-xmark close-modal" style="cursor:pointer;" onclick="document.getElementById('modal-recovery').classList.remove('active')"></i>
+            </div>
+            <div class="modal-recovery-icon">
+                <i class="fa-solid fa-laptop" style="color: #4d4dff; position: relative;">
+                    <i class="fa-solid fa-key" style="color: #ffcc00; position: absolute; font-size: 1.5rem; top: 30%; left: 30%;"></i>
+                </i>
+            </div>
+            <div class="modal-recovery-title" data-i18n="account_recovery_title">Récupération du compte</div>
+            <div class="modal-recovery-text" data-i18n="account_recovery_desc">
+                Exportez et enregistrez votre Clé de récupération pour éviter que vos données deviennent inaccessibles si vous oubliez votre mot de passe ou perdiez votre appli d'authentification.<br>
+                <a href="#">En apprendre davantage</a>.
+            </div>
+            
+            <div class="modal-recovery-box">
+                <div class="mrb-left">
+                    <div class="mrb-title" data-i18n="account_export_recovery_key">Exporter votre Clé de récupération</div>
+                    <div class="mrb-key"><i class="fa-solid fa-key"></i> <span id="recovery-key-display" data-i18n="account_loading">Chargement...</span></div>
+                </div>
+                <button class="mrb-btn" id="btn-download-key" data-i18n="account_btn_download">Télécharger</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Password Prompt Modal -->
+    <div class="modal-overlay" id="modal-password-prompt">
+        <div class="modal" style="max-width: 400px; text-align: center; padding: 30px;">
+            <div style="font-size: 3rem; color: var(--accent); margin-bottom: 15px;">
+                <i class="fa-solid fa-lock"></i>
+            </div>
+            <h3 style="margin-bottom: 15px;" data-i18n="prompt_auth_required">Authentification requise</h3>
+            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 25px;" data-i18n="prompt_password_for_key">
+                Clé maître non trouvée dans la session.<br>Veuillez entrer votre mot de passe pour la générer :
+            </p>
+            <div class="input-group" style="text-align: left; margin-bottom: 20px;">
+                <input type="password" id="prompt-password-input" class="input-control" placeholder="Votre mot de passe..." style="width: 100%;">
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary" id="btn-prompt-cancel" style="flex: 1;" data-i18n="cancel">Annuler</button>
+                <button class="btn btn-primary" id="btn-prompt-submit" style="flex: 1;" data-i18n="confirm">Confirmer</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Format size utility
+        function formatSize(bytes) {
+            bytes = parseInt(bytes, 10);
+            if (isNaN(bytes) || bytes <= 0) return '0 o';
+            const k = 1024;
+            const sizes = ['o', 'Ko', 'Mo', 'Go', 'To'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.account-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            
+            document.getElementById(`tab-btn-${tabName}`).classList.add('active');
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+        }
+
+        async function initAccount() {
+            // Check auth and load profile
+            try {
+                const res = await fetch('api/user.php?action=profile');
+                const data = await res.json();
+                if (data.status !== 'success') {
+                    window.location.href = 'index.html';
+                    return;
+                }
+                
+                const user = data.profile;
+                const displayName = (user.first_name || user.last_name) ? `${user.first_name || ''} ${user.last_name || ''}`.trim() : user.username;
+                
+                document.getElementById('acc-name').textContent = displayName;
+                document.getElementById('acc-welcome-name').textContent = displayName;
+                document.querySelector('.account-email').textContent = user.email;
+                
+                document.getElementById('input-first-name').value = user.first_name || '';
+                document.getElementById('input-last-name').value = user.last_name || '';
+                document.getElementById('input-birth-date').value = user.birth_date || '';
+                document.getElementById('input-country').value = user.country || '';
+                
+                const planName = user.plan_type === 'pro1' ? 'PRO I' : (user.plan_type === 'pro2' ? 'PRO II' : 'FREE');
+                document.getElementById('acc-plan-badge-text').textContent = planName;
+                document.getElementById('bill-plan-name').textContent = planName;
+                
+                if (user.billing_info) {
+                    document.getElementById('bill-payment').textContent = user.billing_info;
+                }
+                
+                if (user.plan_type !== 'free') {
+                    const btnUpgrade = document.getElementById('btn-upgrade-main');
+                    if (btnUpgrade) btnUpgrade.style.display = 'none';
+                    document.getElementById('btn-upgrade-billing').textContent = "Gérer l'abonnement";
+                }
+                
+                const accAvatar = document.getElementById('acc-avatar');
+                if (user.avatar) {
+                    accAvatar.style.backgroundImage = `url(${user.avatar}?t=${new Date().getTime()})`;
+                    accAvatar.style.backgroundSize = 'cover';
+                    accAvatar.style.backgroundPosition = 'center';
+                    accAvatar.style.backgroundColor = 'transparent';
+                    accAvatar.textContent = '';
+                } else {
+                    accAvatar.textContent = user.username ? user.username.charAt(0).toUpperCase() : 'U';
+                    accAvatar.style.backgroundImage = 'none';
+                    accAvatar.style.backgroundColor = '';
+                }
+                
+                if (user.created_at) {
+                    const d = new Date(user.created_at);
+                    document.getElementById('acc-date').textContent = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' });
+                }
+                
+                const statRes = await fetch('api/user.php?action=stats');
+                const statData = await statRes.json();
+                
+                if (statData.status === 'success') {
+                    const used = parseInt(statData.stats.used_storage) || 0;
+                    const total = parseInt(statData.stats.total_storage) || (50 * 1024 * 1024 * 1024);
+                    const trash = parseInt(statData.stats.trash_storage) || 0;
+                    const trashCount = parseInt(statData.stats.trash_count) || 0;
+                    
+                    const pct = total > 0 ? ((used / total) * 100).toFixed(0) : 0;
+                    const cloudPct = total > 0 ? (((used - trash) / total) * 100).toFixed(0) : 0;
+                    const trashPct = total > 0 ? ((trash / total) * 100).toFixed(0) : 0;
+                    const free = Math.max(0, total - used);
+                    const freePct = total > 0 ? ((free / total) * 100).toFixed(0) : 0;
+                    
+                    document.getElementById('circ-pct').textContent = `${pct}%`;
+                    document.getElementById('val-used').textContent = formatSize(used);
+                    document.getElementById('val-total').textContent = formatSize(total);
+                    
+                    document.getElementById('pct-cloud').innerHTML = `${cloudPct}% <span>[${formatSize(Math.max(0, used - trash))}]</span>`;
+                    document.getElementById('pct-trash').innerHTML = `${trashPct}% <span>[${formatSize(trash)}]</span>`;
+                    document.getElementById('pct-free').innerHTML = `${freePct}% <span>[${formatSize(free)}]</span>`;
+                    
+                    document.getElementById('bar-cloud').style.width = `${cloudPct}%`;
+                    
+                    document.getElementById('data-files-size').textContent = formatSize(Math.max(0, used - trash));
+                    document.getElementById('data-trash-size').textContent = formatSize(trash);
+                    document.getElementById('data-trash-count').textContent = trashCount + ' ' + (trashCount > 1 ? i18n.t('files', 'fichiers') : i18n.t('file', 'fichier'));
+                }
+                
+                // Fetch files count
+                const filesRes = await fetch('api/folders.php?action=list');
+                const filesData = await filesRes.json();
+                if (filesData.status === 'success') {
+                    const numFiles = filesData.files ? filesData.files.length : 0;
+                    const numFolders = filesData.folders ? filesData.folders.length : 0;
+                    
+                    document.getElementById('data-files-count').textContent = numFiles + ' ' + (numFiles > 1 ? i18n.t('files', 'fichiers') : i18n.t('file', 'fichier'));
+                    document.getElementById('data-folders-count').textContent = numFolders + ' ' + (numFolders > 1 ? i18n.t('folders', 'dossiers') : i18n.t('folder', 'dossier'));
+                }
+                
+                // Profile Form Logic
+                const profileForm = document.getElementById('profile-form');
+                profileForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const firstName = document.getElementById('input-first-name').value;
+                    const lastName = document.getElementById('input-last-name').value;
+                    const birthDate = document.getElementById('input-birth-date').value;
+                    const country = document.getElementById('input-country').value;
+                    
+                    const upRes = await fetch('api/user.php?action=update_profile', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ first_name: firstName, last_name: lastName, birth_date: birthDate, country: country })
+                    });
+                    const upData = await upRes.json();
+                    if (upData.status === 'success') {
+                        const msg = document.getElementById('profile-msg');
+                        msg.style.display = 'inline';
+                        setTimeout(() => msg.style.display = 'none', 3000);
+                        
+                        const displayName = (firstName || lastName) ? `${firstName} ${lastName}`.trim() : user.username;
+                        document.getElementById('acc-name').textContent = displayName;
+                        document.getElementById('acc-welcome-name').textContent = displayName;
+                    }
+                });
+
+                // Delete Account Logic
+                const btnDeleteAcc = document.getElementById('btn-delete-account');
+                if (btnDeleteAcc) {
+                    btnDeleteAcc.addEventListener('click', async () => {
+                        const confirmMsg = i18n.t('account_delete_confirm', "Avertissement : Après avoir confirmé cette action, vous ne pourrez ni accéder aux données de votre compte, ni à vos contacts, ni à vos conversations sur MEGA CLONE.\n\nÊtes-vous sûr de vouloir supprimer définitivement votre compte ?");
+                        if (confirm(confirmMsg)) {
+                            try {
+                                const delRes = await fetch('api/user.php?action=delete_account', { method: 'POST' });
+                                const delData = await delRes.json();
+                                if (delData.status === 'success') {
+                                    alert(i18n.t('account_deleted_alert', "Votre compte a été supprimé."));
+                                    window.location.href = 'index.html';
+                                } else {
+                                    alert(i18n.t('error_prefix', "Erreur: ") + delData.message);
+                                }
+                            } catch (err) {
+                                alert(i18n.t('error_network', "Erreur réseau"));
+                            }
+                        }
+                    });
+                }
+
+                // Load Notification Settings
+                if (user.notification_settings) {
+                    try {
+                        const ns = JSON.parse(user.notification_settings);
+                        if (ns['ns-acc-all'] !== undefined) document.getElementById('ns-acc-all').checked = ns['ns-acc-all'];
+                        if (ns['ns-acc-c1'] !== undefined) document.getElementById('ns-acc-c1').checked = ns['ns-acc-c1'];
+                        if (ns['ns-acc-c2'] !== undefined) document.getElementById('ns-acc-c2').checked = ns['ns-acc-c2'];
+                        if (ns['ns-acc-c3'] !== undefined) document.getElementById('ns-acc-c3').checked = ns['ns-acc-c3'];
+                        if (ns['ns-acc-c4'] !== undefined) document.getElementById('ns-acc-c4').checked = ns['ns-acc-c4'];
+                        if (ns['ns-acc-chat1'] !== undefined) document.getElementById('ns-acc-chat1').checked = ns['ns-acc-chat1'];
+                        if (ns['ns-acc-cont1'] !== undefined) document.getElementById('ns-acc-cont1').checked = ns['ns-acc-cont1'];
+                        if (ns['ns-acc-cont2'] !== undefined) document.getElementById('ns-acc-cont2').checked = ns['ns-acc-cont2'];
+                        
+                        if (ns['ns-email-all'] !== undefined) document.getElementById('ns-email-all').checked = ns['ns-email-all'];
+                        if (ns['ns-em-cont1'] !== undefined) document.getElementById('ns-em-cont1').checked = ns['ns-em-cont1'];
+                        if (ns['ns-em-chat1'] !== undefined) document.getElementById('ns-em-chat1').checked = ns['ns-em-chat1'];
+                        if (ns['ns-em-quota1'] !== undefined) document.getElementById('ns-em-quota1').checked = ns['ns-em-quota1'];
+                    } catch(e){}
+                }
+
+                const btnSaveNotif = document.getElementById('btn-save-notif-settings');
+                if (btnSaveNotif) {
+                    btnSaveNotif.addEventListener('click', async () => {
+                        const ns = {
+                            'ns-acc-all': document.getElementById('ns-acc-all').checked,
+                            'ns-acc-c1': document.getElementById('ns-acc-c1').checked,
+                            'ns-acc-c2': document.getElementById('ns-acc-c2').checked,
+                            'ns-acc-c3': document.getElementById('ns-acc-c3').checked,
+                            'ns-acc-c4': document.getElementById('ns-acc-c4').checked,
+                            'ns-acc-chat1': document.getElementById('ns-acc-chat1').checked,
+                            'ns-acc-cont1': document.getElementById('ns-acc-cont1').checked,
+                            'ns-acc-cont2': document.getElementById('ns-acc-cont2').checked,
+                            'ns-email-all': document.getElementById('ns-email-all').checked,
+                            'ns-em-cont1': document.getElementById('ns-em-cont1').checked,
+                            'ns-em-chat1': document.getElementById('ns-em-chat1').checked,
+                            'ns-em-quota1': document.getElementById('ns-em-quota1').checked
+                        };
+                        const res = await fetch('api/user.php?action=update_notification_settings', {
+                            method: 'POST',
+                            headers: {'Content-Type': 'application/json'},
+                            body: JSON.stringify({ settings: JSON.stringify(ns) })
+                        });
+                        const data = await res.json();
+                        if (data.status === 'success') {
+                            alert(data.message);
+                        } else {
+                            alert(data.message);
+                        }
+                    });
+                }
+                
+                // Switch tab if hash is present
+                if (window.location.hash === '#notifications') {
+                    switchTab('notifications');
+                }
+
+            } catch (e) {
+                console.error('Error loading account dashboard', e);
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', initAccount);
+
+        // Recovery Key Modal Logic
+        const btnExportKey = document.getElementById('btn-export-key');
+        const modalRecovery = document.getElementById('modal-recovery');
+        const recoveryKeyDisplay = document.getElementById('recovery-key-display');
+        const btnDownloadKey = document.getElementById('btn-download-key');
+
+        function askPasswordModal() {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('modal-password-prompt');
+                const input = document.getElementById('prompt-password-input');
+                const btnSubmit = document.getElementById('btn-prompt-submit');
+                const btnCancel = document.getElementById('btn-prompt-cancel');
+                
+                modal.classList.add('active');
+                input.value = '';
+                input.focus();
+                
+                const cleanup = () => {
+                    modal.classList.remove('active');
+                    btnSubmit.removeEventListener('click', onSubmit);
+                    btnCancel.removeEventListener('click', onCancel);
+                    input.removeEventListener('keypress', onKeyPress);
+                };
+                
+                const onSubmit = () => {
+                    const val = input.value;
+                    if (!val) return;
+                    cleanup();
+                    resolve(val);
+                };
+                
+                const onCancel = () => {
+                    cleanup();
+                    resolve(null);
+                };
+                
+                const onKeyPress = (e) => {
+                    if (e.key === 'Enter') onSubmit();
+                };
+                
+                btnSubmit.addEventListener('click', onSubmit);
+                btnCancel.addEventListener('click', onCancel);
+                input.addEventListener('keypress', onKeyPress);
+            });
+        }
+
+        if (btnExportKey && modalRecovery) {
+            btnExportKey.addEventListener('click', async (e) => {
+                e.preventDefault();
+                let masterKey = sessionStorage.getItem('master_key');
+                
+                if (!masterKey) {
+                    const pass = await askPasswordModal();
+                    if (pass) {
+                        try {
+                            masterKey = await deriveMasterKey(pass);
+                            sessionStorage.setItem('master_key', masterKey);
+                        } catch(err) {
+                            alert(i18n.t('error_key_generation', "Erreur lors de la génération de la clé."));
+                            return;
+                        }
+                    } else {
+                        return;
+                    }
+                }
+                
+                if (masterKey) {
+                    recoveryKeyDisplay.textContent = masterKey;
+                    modalRecovery.classList.add('active');
+                }
+            });
+        }
+
+        if (btnDownloadKey) {
+            btnDownloadKey.addEventListener('click', () => {
+                const masterKey = sessionStorage.getItem('master_key');
+                if (masterKey) {
+                    const blob = new Blob([masterKey], { type: 'text/plain' });
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'MEGA_RECOVERY_KEY.txt';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    modalRecovery.classList.remove('active');
+                }
+            });
+        }
+    </script>
+    <script src="assets/js/crypto.js"></script>
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/notifications.js"></script>
+</body>
+</html>

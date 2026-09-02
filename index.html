@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mega Clone - Stockage Cloud Sécurisé</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="landing-page">
+
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="navbar-container">
+            <div class="navbar-brand">
+                <i class="fa-solid fa-cloud"></i> MEGA CLONE
+            </div>
+            <ul class="navbar-menu">
+                <li><a href="#features" data-i18n="nav_features">Fonctionnalités</a></li>
+                <li><a href="#security" data-i18n="nav_security">Sécurité</a></li>
+                <li><a href="#pricing" data-i18n="nav_pricing">Tarifs</a></li>
+            </ul>
+            <div class="navbar-actions">
+                <button class="btn btn-secondary" id="btn-login-modal" data-i18n="nav_login">Se connecter</button>
+                <button class="btn btn-primary" id="btn-register-modal" data-i18n="nav_register">Créer un compte</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="hero-content">
+            <h1 data-i18n="hero_title">Le stockage en ligne le plus <span>sécurisé</span></h1>
+            <p data-i18n="hero_desc">Mega Clone offre un stockage cloud fiable avec chiffrement de bout en bout. Vos fichiers sont en sécurité, privés, et accessibles de n'importe où.</p>
+            <button class="btn btn-primary btn-large" id="hero-cta" data-i18n="hero_btn">Commencer avec 50 Go gratuits</button>
+        </div>
+        <div class="hero-illustration">
+            <!-- Simple CSS illustration of cloud storage -->
+            <div class="floating-cloud">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+                <div class="glass-panel stat-card">
+                    <i class="fa-solid fa-shield-halved"></i> Chiffré AES-256
+                </div>
+                <div class="glass-panel stat-card stat-card-2">
+                    <i class="fa-solid fa-rocket"></i> Vitesse illimitée
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <h2 class="section-title">Pourquoi choisir Mega Clone ?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-lock"></i></div>
+                <h3>Chiffrement de bout en bout</h3>
+                <p>Vos données sont chiffrées avec une clé dérivée de votre mot de passe avant même de quitter votre appareil. Nous n'avons pas accès à vos fichiers.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-share-nodes"></i></div>
+                <h3>Partager un lien</h3>
+                <p>Partagez facilement des fichiers et des dossiers avec n'importe qui en générant un lien sécurisé en un seul clic.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon"><i class="fa-solid fa-gift"></i></div>
+                <h3>Offre gratuite généreuse</h3>
+                <p>Commencez avec 50 Go d'espace de stockage gratuit sans limite de temps. Uploadez, téléchargez et stockez vos fichiers sans contraintes.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Section -->
+    <section class="security" id="security" style="background: var(--bg-secondary); padding: 5rem 10%; display: flex; align-items: center; gap: 40px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px;">
+            <i class="fa-solid fa-shield-halved" style="font-size: 5rem; color: var(--accent); margin-bottom: 20px;"></i>
+            <h2 class="section-title" style="text-align: left;">La sécurité est notre priorité</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 1.1rem; line-height: 1.6;">Contrairement aux autres services cloud, vos fichiers sont chiffrés <b>côté client</b> avant de quitter votre ordinateur. Votre Master Key ne quitte jamais votre navigateur.</p>
+            <ul style="list-style: none; padding: 0; color: var(--text-primary);">
+                <li style="margin-bottom: 10px;"><i class="fa-solid fa-check" style="color: #4ade80; margin-right: 10px;"></i> Architecture Zéro Connaissance</li>
+                <li style="margin-bottom: 10px;"><i class="fa-solid fa-check" style="color: #4ade80; margin-right: 10px;"></i> Chiffrement AES-256 et AES-GCM</li>
+                <li style="margin-bottom: 10px;"><i class="fa-solid fa-check" style="color: #4ade80; margin-right: 10px;"></i> Partage protégé par mot de passe</li>
+            </ul>
+        </div>
+        <div style="flex: 1; min-width: 300px; display: flex; justify-content: center;">
+            <div style="background: #1e1e24; padding: 2rem; border-radius: 12px; border: 1px solid var(--border); position: relative; width: 100%; max-width: 400px; box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 20px;">
+                    <span style="color: var(--text-secondary);">Fichier.pdf</span>
+                    <i class="fa-solid fa-lock" style="color: #4ade80;"></i>
+                </div>
+                <div style="height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; margin-bottom: 10px;"></div>
+                <div style="height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; margin-bottom: 10px; width: 80%;"></div>
+                <div style="height: 10px; background: rgba(255,255,255,0.05); border-radius: 5px; margin-bottom: 20px; width: 90%;"></div>
+                <div style="font-family: monospace; color: var(--accent); font-size: 0.8rem; word-break: break-all; background: rgba(216, 75, 55, 0.1); padding: 10px; border-radius: 6px;">
+                    e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing" style="padding: 5rem 10%;">
+        <h2 class="section-title">Choisissez le plan adapté à vos besoins</h2>
+        <div class="pricing-grid" style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; margin-top: 3rem;">
+            
+            <!-- Gratuit -->
+            <div class="pricing-card" style="flex: 1; min-width: 280px; max-width: 350px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; text-align: center;">
+                <h3 style="color: var(--text-primary); margin-bottom: 10px; font-size: 1.5rem;">Gratuit</h3>
+                <div style="font-size: 2.5rem; font-weight: bold; color: white; margin-bottom: 5px;">50 Go</div>
+                <div style="color: var(--text-secondary); margin-bottom: 20px;">Toujours gratuit</div>
+                <ul style="list-style: none; padding: 0; text-align: left; margin-bottom: 30px; color: var(--text-secondary);">
+                    <li style="margin-bottom: 12px;"><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 10px;"></i> Stockage sécurisé 50 Go</li>
+                    <li style="margin-bottom: 12px;"><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 10px;"></i> Chiffrement E2EE de bout en bout</li>
+                    <li style="margin-bottom: 12px;"><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 10px;"></i> Partage de fichiers basique</li>
+                </ul>
+                <button class="btn btn-secondary btn-pricing-register" style="width: 100%;">Créer un compte</button>
+            </div>
+
+            <!-- PRO I -->
+            <div class="pricing-card featured" style="flex: 1; min-width: 280px; max-width: 350px; background: rgba(255,255,255,0.05); border: 2px solid var(--accent); border-radius: 12px; padding: 2rem; text-align: center; position: relative; transform: scale(1.05); box-shadow: 0 10px 30px rgba(216, 75, 55, 0.2);">
+                <div style="position: absolute; top: -15px; left: 50%; transform: translateX(-50%); background: var(--accent); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">LE PLUS POPULAIRE</div>
+                <h3 style="color: var(--text-primary); margin-bottom: 10px; font-size: 1.5rem;">PRO I</h3>
+                <div style="font-size: 2.5rem; font-weight: bold; color: white; margin-bottom: 5px;">2 To</div>
+                <div style="color: var(--text-secondary); margin-bottom: 20px;">Soit 2000 Go de stockage</div>
+                <ul style="list-style: none; padding: 0; text-align: left; margin-bottom: 30px; color: var(--text-secondary);">
+                    <li style="margin-bottom: 12px;"><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 10px;"></i> Toutes les fonctions Gratuites</li>
+                    <li style="margin-bottom: 12px;"><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 10px;"></i> Partage protégé par mot de passe</li>
+                    <li style="margin-bottom: 12px;"><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 10px;"></i> Date d'expiration des liens</li>
+                </ul>
+                <button class="btn btn-primary btn-pricing-register" style="width: 100%;">S'inscrire à PRO I</button>
+            </div>
+
+            <!-- PRO II -->
+            <div class="pricing-card" style="flex: 1; min-width: 280px; max-width: 350px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; text-align: center;">
+                <h3 style="color: var(--text-primary); margin-bottom: 10px; font-size: 1.5rem;">PRO II</h3>
+                <div style="font-size: 2.5rem; font-weight: bold; color: white; margin-bottom: 5px;">8 To</div>
+                <div style="color: var(--text-secondary); margin-bottom: 20px;">Pour les gros besoins</div>
+                <ul style="list-style: none; padding: 0; text-align: left; margin-bottom: 30px; color: var(--text-secondary);">
+                    <li style="margin-bottom: 12px;"><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 10px;"></i> Toutes les fonctions PRO I</li>
+                    <li style="margin-bottom: 12px;"><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 10px;"></i> Stockage cloud massif</li>
+                    <li style="margin-bottom: 12px;"><i class="fa-solid fa-check" style="color: var(--accent); margin-right: 10px;"></i> Support client prioritaire</li>
+                </ul>
+                <button class="btn btn-secondary btn-pricing-register" style="width: 100%;">S'inscrire à PRO II</button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer Pro -->
+    <footer class="footer-pro" style="background: #18191f; padding: 4rem 10% 2rem; border-top: 1px solid var(--border); margin-top: 2rem;">
+        <div style="display: flex; flex-wrap: wrap; gap: 40px; justify-content: space-between; margin-bottom: 3rem;">
+            <!-- Brand -->
+            <div style="flex: 1; min-width: 250px;">
+                <div class="navbar-brand" style="margin-bottom: 1rem; color: white; font-size: 1.5rem; font-weight: bold; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-cloud" style="color: var(--accent);"></i> MEGA CLONE
+                </div>
+                <p id="pub-footer-desc" style="color: var(--text-secondary); line-height: 1.6; margin-bottom: 1.5rem;">La plateforme de stockage en ligne la plus sécurisée. Vos données sont chiffrées de bout en bout et vous seul y avez accès.</p>
+                <div style="display: flex; gap: 15px;">
+                    <a href="#" id="pub-footer-twitter" style="color: var(--text-secondary); font-size: 1.2rem; transition: color 0.2s;" class="footer-icon-link"><i class="fa-brands fa-twitter"></i></a>
+                    <a href="#" id="pub-footer-facebook" style="color: var(--text-secondary); font-size: 1.2rem; transition: color 0.2s;" class="footer-icon-link"><i class="fa-brands fa-facebook"></i></a>
+                    <a href="#" id="pub-footer-github" style="color: var(--text-secondary); font-size: 1.2rem; transition: color 0.2s;" class="footer-icon-link"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" id="pub-footer-instagram" style="color: var(--text-secondary); font-size: 1.2rem; transition: color 0.2s;" class="footer-icon-link"><i class="fa-brands fa-instagram"></i></a>
+                </div>
+            </div>
+            
+            <!-- Links Columns -->
+            <div style="display: flex; flex-wrap: wrap; gap: 40px; flex: 2; min-width: 300px; justify-content: flex-end;">
+                <div style="min-width: 150px;">
+                    <h4 style="color: white; margin-bottom: 1.5rem; font-size: 1.1rem;">Produit</h4>
+                    <ul style="list-style: none; padding: 0;">
+                        <li style="margin-bottom: 10px;"><a href="#features" class="footer-link">Fonctionnalités</a></li>
+                        <li style="margin-bottom: 10px;"><a href="#security" class="footer-link">Sécurité</a></li>
+                        <li style="margin-bottom: 10px;"><a href="#pricing" class="footer-link">Tarifs</a></li>
+                        <li style="margin-bottom: 10px;"><a href="#" class="footer-link" id="footer-login">Connexion</a></li>
+                    </ul>
+                </div>
+                <div style="min-width: 150px;">
+                    <h4 style="color: white; margin-bottom: 1.5rem; font-size: 1.1rem;">Légal</h4>
+                    <ul id="pub-footer-legal" style="list-style: none; padding: 0;">
+                        <!-- Generated via JS -->
+                    </ul>
+                </div>
+                <div style="min-width: 150px;">
+                    <h4 style="color: white; margin-bottom: 1.5rem; font-size: 1.1rem;">Support</h4>
+                    <ul id="pub-footer-support" style="list-style: none; padding: 0;">
+                        <!-- Generated via JS -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Copyright -->
+        <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2rem; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; color: var(--text-secondary); font-size: 0.9rem;">
+            <p id="pub-footer-copyright">&copy; 2026 Mega Clone. Tous droits réservés.</p>
+            <div style="display: flex; gap: 20px;">
+                <span>
+                    <i class="fa-solid fa-earth-europe"></i>
+                    <select class="lang-switcher-select" onchange="i18n.setLanguage(this.value)" style="background:transparent; color:inherit; border:none; outline:none; cursor:pointer; font-size:0.9rem;">
+                        <option value="fr" style="background:#18191f;">Français</option>
+                        <option value="en" style="background:#18191f;">English</option>
+                        <option value="es" style="background:#18191f;">Español</option>
+                        <option value="de" style="background:#18191f;">Deutsch</option>
+                    </select>
+                </span>
+                <span>Version 1.0</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Auth Modals -->
+    <div class="modal-overlay" id="auth-modal-overlay">
+        <div class="modal auth-modal" id="auth-modal">
+            <div class="modal-header">
+                <h3 class="modal-title" id="auth-modal-title">Connexion</h3>
+                <button class="modal-close" id="close-auth-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="modal-body">
+                <!-- Login Form -->
+                <form id="login-form">
+                    <div class="input-group">
+                        <label for="login-email">Email</label>
+                        <input type="email" id="login-email" class="input-control" required placeholder="votre@email.com">
+                    </div>
+                    <div class="input-group">
+                        <label for="login-password">Mot de passe</label>
+                        <input type="password" id="login-password" class="input-control" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                        <i class="fa-solid fa-right-to-bracket"></i> Se connecter
+                    </button>
+                    <div class="auth-switch">
+                        Pas encore de compte ? <a href="#" id="show-register">Créer un compte</a>
+                    </div>
+                </form>
+
+                <!-- Suspended Alert -->
+                <div id="suspended-alert" class="hidden" style="text-align: center; padding: 20px 0;">
+                    <i class="fa-solid fa-user-lock" style="font-size: 4rem; color: #ef4444; margin-bottom: 20px;"></i>
+                    <h3 style="color: #ef4444; margin-bottom: 15px; font-size: 1.5rem;">Compte Suspendu</h3>
+                    <p style="color: var(--text-secondary); margin-bottom: 25px; line-height: 1.5;">Votre accès a été suspendu par un administrateur.<br>Veuillez contacter le support si vous pensez qu'il s'agit d'une erreur.</p>
+                    <button class="btn btn-secondary" id="btn-back-login" style="width: 100%;">Retour</button>
+                </div>
+
+                <!-- Register Form -->
+                <form id="register-form" class="hidden">
+                    <div class="input-group">
+                        <label for="reg-username">Nom d'utilisateur</label>
+                        <input type="text" id="reg-username" class="input-control" required placeholder="johndoe">
+                    </div>
+                    <div class="input-group">
+                        <label for="reg-email">Email</label>
+                        <input type="email" id="reg-email" class="input-control" required placeholder="votre@email.com">
+                    </div>
+                    <div class="input-group">
+                        <label for="reg-password">Mot de passe</label>
+                        <input type="password" id="reg-password" class="input-control" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">
+                        <i class="fa-solid fa-user-plus"></i> S'inscrire
+                    </button>
+                    <div class="auth-switch">
+                        Déjà un compte ? <a href="#" id="show-login">Se connecter</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification" class="notification">
+        <i class="fa-solid fa-circle-info"></i>
+        <span id="notif-message">Message</span>
+    </div>
+
+    <script src="assets/js/crypto.js"></script>
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/auth.js"></script>
+    <script src="assets/js/landing.js"></script>
+</body>
+</html>

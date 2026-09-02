@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEGA-CLONE</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .loader {
+            display: none;
+            margin: 1rem auto;
+            border: 4px solid #2d313c;
+            border-top: 4px solid #33cc33;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body class="share-page-body">
+
+    <div class="share-download-box" id="share-box">
+        <div class="share-logo">
+            <i class="fa-solid fa-cloud"></i> MEGA-CLONE
+        </div>
+
+        <div class="loader" id="loader" style="display: block;"></div>
+        <p id="status-text" style="color: #aeb4c0;" data-i18n="share_decrypting">Déchiffrement des métadonnées...</p>
+
+        <div id="password-form" class="hidden" style="text-align: center;">
+            <div class="share-file-icon-large" style="margin-bottom: 15px;"><i class="fa-solid fa-lock"
+                    style="color: #f39c12;"></i></div>
+            <h3 style="color: var(--text-primary); margin-bottom: 10px;" data-i18n="share_protected_link">Lien protégé
+            </h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;"
+                data-i18n="share_protected_desc">Ce partage est protégé par un mot de passe.</p>
+            <div style="margin-bottom: 15px;">
+                <input type="password" id="unlock-password" data-i18n-placeholder="share_password_placeholder"
+                    placeholder="Mot de passe"
+                    style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-hover); color: var(--text-primary); outline: none;">
+            </div>
+            <button class="btn-download-mega" id="btn-unlock" style="background: #f39c12; margin-top: 5px;"
+                data-i18n="share_unlock">Déverrouiller</button>
+        </div>
+
+        <div id="decryption-key-form" class="hidden" style="text-align: center;">
+            <div class="share-file-icon-large" style="margin-bottom: 15px;"><i class="fa-solid fa-key"
+                    style="color: #33cc33;"></i></div>
+            <h3 style="color: var(--text-primary); margin-bottom: 10px;" data-i18n="share_key_required">Clé de
+                déchiffrement requise</h3>
+            <p style="color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem;" data-i18n="share_key_desc">
+                Ce lien nécessite une clé de déchiffrement pour accéder au contenu.</p>
+            <div style="margin-bottom: 15px;">
+                <input type="text" id="unlock-key" data-i18n-placeholder="share_key_placeholder"
+                    placeholder="Entrez la clé de déchiffrement"
+                    style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border); background: var(--bg-hover); color: var(--text-primary); outline: none;">
+            </div>
+            <button class="btn-download-mega" id="btn-unlock-key" style="background: #33cc33; margin-top: 5px;"
+                data-i18n="share_decrypt">Déchiffrer</button>
+        </div>
+
+        <div id="file-info" class="hidden">
+            <div class="share-file-icon-large"><i class="fa-solid fa-file"></i></div>
+            <div class="share-file-title" id="file-name">filename.ext</div>
+            <div class="share-file-size" id="file-size">0 KB</div>
+            <button class="btn-download-mega" id="btn-download" data-i18n="share_download">
+                Télécharger
+            </button>
+        </div>
+
+        <div id="folder-info" class="hidden" style="width: 100%; max-width: 600px; margin: 0 auto; text-align: left;">
+            <div class="share-file-icon-large" style="text-align: center;"><i class="fa-solid fa-folder"
+                    style="color: var(--accent);"></i></div>
+            <div class="share-file-title" id="folder-name" style="text-align: center; margin-bottom: 20px;"
+                data-i18n="share_shared_folder">Dossier Partagé</div>
+
+            <div
+                style="background: rgba(0,0,0,0.2); border-radius: 8px; padding: 10px; max-height: 300px; overflow-y: auto;">
+                <table style="width: 100%; border-collapse: collapse; color: var(--text-primary);">
+                    <thead>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.1); text-align: left;">
+                            <th style="padding: 10px;" data-i18n="share_col_name">Nom</th>
+                            <th style="padding: 10px; width: 100px;" data-i18n="share_col_size">Taille</th>
+                            <th style="padding: 10px; width: 80px; text-align: center;" data-i18n="share_col_action">
+                                Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="folder-files-list">
+                        <!-- Files injected here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notification" class="notification">
+        <i class="fa-solid fa-circle-info"></i>
+        <span id="notif-message">Message</span>
+    </div>
+
+    <script src="assets/js/crypto.js"></script>
+    <script src="assets/js/i18n.js"></script>
+    <script src="assets/js/share.js"></script>
+</body>
+
+</html>
