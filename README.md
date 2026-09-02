@@ -11,9 +11,10 @@ Une application web reproduisant les fonctionnalités principales du célèbre s
 
 ## 🛠️ Technologies Utilisées
 
-*   **Frontend :** [Ex: HTML, CSS, JavaScript, React...]
-*   **Backend :** [Ex: Node.js, PHP, Python, Firebase...]
-*   **Base de données :** [Ex: MySQL, MongoDB, PostgreSQL...]
+*   **Frontend :** HTML5, CSS3, JavaScript (Vanilla), Font Awesome (Icônes), Chart.js (Graphiques), JSZip.
+*   **Backend :** PHP (Natif / PDO).
+*   **Base de données :** MySQL.
+*   **Paiement :** PayPal SDK (Intégration).
 
 ## 💻 Installation en local
 
