@@ -254,6 +254,10 @@ $router->get('list', function() use ($pdo, $user_id) {
 
 $router->get('list_all', function() use ($pdo, $user_id) {
     try {
+        // Ajout de la définition de la variable manquante
+        $show_hidden = isset($_GET['show_hidden']) && $_GET['show_hidden'] == '1';
+        $hidden_cond = $show_hidden ? '' : ' AND is_hidden = 0';
+
         $stmt = $pdo->prepare("SELECT id, name, parent_id, is_hidden FROM folders WHERE user_id = ? AND deleted_at IS NULL" . $hidden_cond . " ORDER BY name ASC");
         $stmt->execute([$user_id]);
         $folders = $stmt->fetchAll();
