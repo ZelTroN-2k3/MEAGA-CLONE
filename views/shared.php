@@ -1,7 +1,6 @@
             <!-- Shared Items View (Hidden by default) -->
-            <div id="view-shared" class="hidden"
-                style="flex: 1; height: 100%; display: flex; flex-direction: column; background: #111111; color: white; overflow: hidden;">
-
+                <div id="view-shared" class="hidden" style="padding: 20px 40px; box-sizing: border-box; width: 100%;">
+                
                 <div class="shared-tabs-header">
                     <div class="shared-tab" data-target="shared-incoming" data-i18n="shared_tab_incoming">Partages entrants</div>
                     <div class="shared-tab" data-target="shared-outgoing" data-i18n="shared_tab_outgoing">Partages sortants</div>
