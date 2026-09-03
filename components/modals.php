@@ -338,7 +338,7 @@
             <div class="user-menu-item hidden" id="menu-toggle-hidden">
                 <i class="fa-solid fa-eye-slash" style="margin-right: 10px; color: #aeb4c0;"></i><span data-i18n="menu_toggle_hidden">Afficher éléments cachés</span>
             </div>
-            <div class="user-menu-item"><i class="fa-solid fa-key" style="margin-right: 10px; color: #ffcc00;"></i><span data-i18n="menu_recovery_key">Clé
+            <div class="user-menu-item" id="dropdown-export-key" style="cursor: pointer;"><i class="fa-solid fa-key" style="margin-right: 10px; color: #ffcc00;"></i><span data-i18n="menu_recovery_key">Clé
                 de récupération</span></div>
             <div class="user-menu-item" id="btn-show-settings"><i class="fa-solid fa-lock"
                     style="margin-right: 10px; color: #00ff15;"></i><span data-i18n="modal_password_title">Paramètres (Mot de passe)</span></div>
