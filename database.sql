@@ -20,6 +20,8 @@ CREATE TABLE IF NOT EXISTS users (
     plan_type VARCHAR(50) DEFAULT 'free',
     avatar VARCHAR(255) DEFAULT NULL,
     notification_settings JSON DEFAULT NULL,
+    reset_token VARCHAR(255) NULL DEFAULT NULL,
+    reset_expires DATETIME NULL DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

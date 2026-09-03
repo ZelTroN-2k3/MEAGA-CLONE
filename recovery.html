@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Récupération de compte - MEGA Clone</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: var(--bg-dark);
+            color: var(--text-primary);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+        }
+
+        .recovery-container {
+            background: var(--bg-panel);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid var(--border);
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .mega-logo-large {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 60px;
+            height: 60px;
+            background: var(--accent);
+            color: white;
+            border-radius: 50%;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .mt-3 {
+            margin-top: 15px;
+        }
+
+        .status-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-info {
+            background: rgba(59, 130, 246, 0.1);
+            color: #60a5fa;
+            border: 1px solid #3b82f6;
+        }
+
+        .status-error {
+            background: rgba(239, 68, 68, 0.1);
+            color: #f87171;
+            border: 1px solid #ef4444;
+        }
+
+        .status-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #4ade80;
+            border: 1px solid #22c55e;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="recovery-container">
+        <div class="logo-container">
+            <div class="mega-logo-large">M</div>
+            <h2>Récupération de compte</h2>
+        </div>
+
+        <div id="status-message" class="status-box hidden"></div>
+
+        <!-- VUE 1 : Demande de lien -->
+        <div id="view-request">
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px; text-align: center;">
+                Saisissez votre adresse email. Si un compte y est associé, nous générerons un lien de récupération
+                sécurisé.
+            </p>
+            <form id="form-request">
+                <div class="input-group">
+                    <label>Adresse Email</label>
+                    <input type="email" id="req-email" class="input-control" placeholder="vous@exemple.com" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;"
+                    id="btn-request">Demander le lien</button>
+            </form>
+            <div class="text-center mt-3">
+                <a href="index.html"
+                    style="color: var(--text-secondary); text-decoration: none; font-size: 0.9rem;">Retour à la
+                    connexion</a>
+            </div>
+        </div>
+
+        <!-- VUE 2 : Restauration avec Master Key (Cachée par défaut) -->
+        <div id="view-reset" class="hidden">
+            <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 20px;">
+                Bonjour <strong id="reset-username"></strong>.<br>
+                Pour conserver l'accès à vos fichiers chiffrés, veuillez coller votre clé de récupération (Master Key)
+                et définir un nouveau mot de passe.
+            </p>
+            <form id="form-reset">
+                <div class="input-group">
+                    <label>Clé de récupération (Contenu de MEGA_RECOVERY_KEY.txt)</label>
+                    <textarea id="res-masterkey" class="input-control" rows="3"
+                        placeholder="Collez votre clé hexadécimale ici..." required
+                        style="resize: none; font-family: monospace; font-size: 0.8rem;"></textarea>
+                </div>
+                <div class="input-group">
+                    <label>Nouveau mot de passe</label>
+                    <input type="password" id="res-password" class="input-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;"
+                    id="btn-reset">Restaurer mon compte</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts de cryptographie essentiels -->
+    <script src="assets/js/crypto.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const viewRequest = document.getElementById('view-request');
+            const viewReset = document.getElementById('view-reset');
+            const statusMsg = document.getElementById('status-message');
+
+            // Analyser l'URL pour chercher un token
+            const urlParams = new URLSearchParams(window.location.search);
+            const token = urlParams.get('token');
+            let userFiles = []; // Stockera les clés chiffrées à traiter
+
+            function showStatus(msg, type) {
+                statusMsg.textContent = msg;
+                statusMsg.className = `status-box status-${type}`;
+            }
+
+            if (token) {
+                // ETAPE 2 : On a un token, on valide et on affiche le formulaire de Master Key
+                viewRequest.classList.add('hidden');
+                viewReset.classList.remove('hidden');
+
+                try {
+                    const res = await fetch('api/recovery.php?action=validate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ token })
+                    });
+                    const data = await res.json();
+
+                    if (data.status === 'success') {
+                        document.getElementById('reset-username').textContent = data.user.username;
+                        userFiles = data.files; // On sauvegarde les fichiers en mémoire
+                    } else {
+                        viewReset.classList.add('hidden');
+                        showStatus(data.message, 'error');
+                    }
+                } catch (e) {
+                    viewReset.classList.add('hidden');
+                    showStatus("Erreur réseau lors de la validation du lien.", 'error');
+                }
+            }
+
+            // GESTION DU FORMULAIRE 1 : Demande de lien
+            document.getElementById('form-request').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btn-request');
+                const email = document.getElementById('req-email').value;
+
+                btn.disabled = true;
+                btn.textContent = "Génération en cours...";
+
+                try {
+                    const res = await fetch('api/recovery.php?action=request', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email })
+                    });
+                    const data = await res.json();
+
+                    showStatus(data.message + " (Vérifiez le fichier local_email_interceptor.txt)", data.status);
+                    document.getElementById('form-request').reset();
+                } catch (e) {
+                    showStatus("Erreur réseau.", 'error');
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = "Demander le lien";
+                }
+            });
+
+            // GESTION DU FORMULAIRE 2 : Rechiffrement local et mise à jour
+            document.getElementById('form-reset').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('btn-reset');
+                const oldMasterKeyHex = document.getElementById('res-masterkey').value.trim();
+                const newPassword = document.getElementById('res-password').value;
+
+                btn.disabled = true;
+                showStatus("Vérification de la clé de secours...", "info");
+
+                try {
+                    const newKeysPayload = {};
+
+                    // Si l'utilisateur a des fichiers, on teste sa clé de secours
+                    if (userFiles.length > 0) {
+                        try {
+                            // On tente de déchiffrer le tout premier fichier avec la clé fournie
+                            await decryptKeyData(userFiles[0].encrypted_key, oldMasterKeyHex);
+                        } catch (err) {
+                            throw new Error("Clé de récupération invalide. Accès refusé.");
+                        }
+
+                        // Si on arrive ici, l'ancienne clé est bonne ! 
+                        // On dérive la NOUVELLE Master Key à partir du nouveau mot de passe
+                        showStatus("Clé validée ! Rechiffrement des fichiers en cours...", "info");
+                        const newMasterKeyHex = await deriveMasterKey(newPassword);
+
+                        // On boucle sur tous les fichiers pour les rechiffrer
+                        for (let file of userFiles) {
+                            // 1. Déchiffrer avec l'ancienne clé
+                            const keys = await decryptKeyData(file.encrypted_key, oldMasterKeyHex);
+                            // 2. Rechiffrer avec la nouvelle clé
+                            const newEncryptedKey = await encryptKeyData(keys.fileKeyBytes, keys.ivBytes, newMasterKeyHex);
+                            // 3. Stocker dans notre objet de mise à jour
+                            newKeysPayload[file.id] = newEncryptedKey;
+                        }
+                    }
+
+                    // On envoie le tout au serveur
+                    showStatus("Sauvegarde dans la base de données...", "info");
+                    const res = await fetch('api/recovery.php?action=apply', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            token: token,
+                            new_password: newPassword,
+                            keys: newKeysPayload
+                        })
+                    });
+
+                    const data = await res.json();
+
+                    if (data.status === 'success') {
+                        showStatus("Succès ! Redirection vers la connexion...", "success");
+                        setTimeout(() => { window.location.href = 'index.html'; }, 2000);
+                    } else {
+                        throw new Error(data.message);
+                    }
+
+                } catch (e) {
+                    showStatus(e.message || "Une erreur critique s'est produite.", "error");
+                    btn.disabled = false;
+                    btn.textContent = "Réessayer";
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
