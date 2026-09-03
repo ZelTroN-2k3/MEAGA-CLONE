@@ -23,7 +23,7 @@ function formatSize(bytes) {
 function getFileIcon(filename) {
     if (!filename || !filename.includes('.')) return '<i class="fa-solid fa-file icon-file"></i>';
     const ext = filename.split('.').pop().toLowerCase();
-    
+
     // Images
     if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico'].includes(ext)) {
         return '<i class="fa-regular fa-file-image icon-file" style="color: #4ade80;"></i>'; // Light green
@@ -60,7 +60,7 @@ function getFileIcon(filename) {
     else if (['html', 'css', 'js', 'php', 'json', 'xml'].includes(ext)) {
         return '<i class="fa-regular fa-file-code icon-file" style="color: #22d3ee;"></i>'; // Cyan
     }
-    
+
     // Default
     return '<i class="fa-solid fa-file icon-file"></i>';
 }
@@ -69,7 +69,7 @@ function getFileThumbnailOrIcon(file) {
     if (!file.name || !file.name.includes('.')) return getFileIcon(file.name);
     const ext = file.name.split('.').pop().toLowerCase();
     const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
-    
+
     // Si c'est une image non chiffrée, on peut l'afficher directement
     if (isImage && (!file.encrypted_key || file.encrypted_key === 'null' || file.encrypted_key === 'undefined' || file.encrypted_key === '')) {
         const fallbackIcon = getFileIcon(file.name).replace(/"/g, '&quot;');
@@ -79,7 +79,7 @@ function getFileThumbnailOrIcon(file) {
         const fallbackIcon = getFileIcon(file.name).replace(/"/g, '&quot;');
         return `<div class="lazy-thumbnail file-thumbnail" data-id="${file.id}" data-key="${file.encrypted_key}" data-fallback="${fallbackIcon}"></div>`;
     }
-    
+
     return getFileIcon(file.name);
 }
 
@@ -87,33 +87,33 @@ function getFileThumbnailOrIcon(file) {
 const thumbnailObserver = new IntersectionObserver(async (entries, observer) => {
     const masterKeyHex = sessionStorage.getItem('master_key');
     if (!masterKeyHex) return;
-    
+
     for (const entry of entries) {
         if (entry.isIntersecting) {
             const el = entry.target;
             observer.unobserve(el);
             el.classList.add('loading');
-            
+
             try {
                 const id = el.dataset.id;
                 const encKey = el.dataset.key;
                 const keys = await decryptKeyData(encKey, masterKeyHex);
-                
+
                 const response = await fetch(`api/files.php?action=thumbnail&id=${id}`);
                 if (!response.ok) throw new Error('Thumbnail not found');
-                
+
                 const blob = await response.blob();
                 const buffer = await blob.arrayBuffer();
-                
+
                 // The first 12 bytes are the IV, the rest is the ciphertext
                 if (buffer.byteLength < 12) throw new Error('Invalid thumbnail format');
-                
+
                 const iv = new Uint8Array(buffer, 0, 12);
                 const ciphertextBlob = new Blob([buffer.slice(12)]);
-                
+
                 const decryptedBlob = await decryptFile(ciphertextBlob, keys.fileKeyBytes, iv);
                 const url = URL.createObjectURL(decryptedBlob);
-                
+
                 el.outerHTML = `<img src="${url}" class="file-thumbnail">`;
             } catch (e) {
                 console.error('Thumbnail decryption failed', e);
@@ -126,7 +126,7 @@ const thumbnailObserver = new IntersectionObserver(async (entries, observer) => 
 function getReadableType(filename) {
     if (!filename || !filename.includes('.')) return i18n.t('type_file', 'Fichier');
     const ext = filename.split('.').pop().toLowerCase();
-    
+
     if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg', 'bmp', 'ico'].includes(ext)) return i18n.t('type_image', 'Image') + ' ' + ext.toUpperCase();
     if (['mp4', 'mkv', 'avi', 'mov', 'webm'].includes(ext)) return i18n.t('type_video', 'Vidéo');
     if (['mp3', 'wav', 'ogg', 'flac'].includes(ext)) return i18n.t('type_audio', 'Audio');
@@ -145,7 +145,7 @@ function showNotification(message, type = 'info') {
     const notif = document.getElementById('notification');
     const msg = document.getElementById('notif-message');
     msg.textContent = message;
-    
+
     if (type === 'error') notif.style.borderLeftColor = '#ff3333';
     else if (type === 'success') notif.style.borderLeftColor = '#33cc33';
     else notif.style.borderLeftColor = 'var(--accent)';
@@ -161,26 +161,26 @@ function showConfirmModal(title, text) {
             resolve(confirm(title + "\n" + text));
             return;
         }
-        
+
         const titleEl = document.getElementById('confirm-modal-title');
         const textEl = document.getElementById('confirm-modal-desc');
         const btnCancel = document.getElementById('btn-confirm-cancel');
         const btnSubmit = document.getElementById('btn-confirm-submit');
-        
+
         if (title) titleEl.textContent = title;
         if (text) textEl.textContent = text;
-        
+
         modal.classList.add('active');
-        
+
         const cleanup = () => {
             modal.classList.remove('active');
             btnCancel.removeEventListener('click', onCancel);
             btnSubmit.removeEventListener('click', onSubmit);
         };
-        
+
         const onCancel = () => { cleanup(); resolve(false); };
         const onSubmit = () => { cleanup(); resolve(true); };
-        
+
         btnCancel.addEventListener('click', onCancel);
         btnSubmit.addEventListener('click', onSubmit);
     });
@@ -196,7 +196,7 @@ async function initAuth() {
             const userAvatarBtn = document.getElementById('user-menu-btn');
             const dropdownAvatar = document.getElementById('dropdown-avatar');
             const dropdownAvatarText = document.getElementById('dropdown-avatar-text');
-            
+
             const setAvatar = (element, avatarUrl, initial) => {
                 if (!element) return;
                 if (avatarUrl) {
@@ -220,21 +220,21 @@ async function initAuth() {
             if (sidebarAvatar) setAvatar(sidebarAvatar, data.user.avatar, username.charAt(0).toUpperCase());
 
             if (userAvatarBtn) userAvatarBtn.title = username;
-            
+
             const displayName = (data.user.first_name || data.user.last_name) ? `${data.user.first_name || ''} ${data.user.last_name || ''}`.trim() : username;
-            
+
             const dropdownUsername = document.getElementById('dropdown-username');
             if (dropdownUsername) dropdownUsername.textContent = displayName;
-            
+
             const dropdownEmail = document.getElementById('dropdown-email');
             if (dropdownEmail) dropdownEmail.textContent = data.user.email || '';
-            
+
             // Admin Panel
             if (data.user.is_admin == 1) {
                 const adminPanelSection = document.getElementById('admin-panel-section');
                 if (adminPanelSection) adminPanelSection.style.display = 'block';
             }
-            
+
             // Plan Type UI
             window.userPlanType = data.user.plan_type || 'free';
             if (data.user.plan_type && data.user.plan_type !== 'free') {
@@ -246,7 +246,7 @@ async function initAuth() {
                     l.style.color = 'var(--accent)';
                     l.style.fontWeight = 'bold';
                 });
-                
+
                 // Hide promo boxes for PRO users
                 const promoBox = document.querySelector('.share-promo-box');
                 const badgesPro = document.querySelectorAll('.badge-pro, .badge-pro-ctx');
@@ -257,7 +257,7 @@ async function initAuth() {
                 const toggleHiddenMenu = document.getElementById('menu-toggle-hidden');
                 if (toggleHiddenMenu) toggleHiddenMenu.classList.remove('hidden');
             }
-            
+
             loadItems();
             updateStorageUI();
         } else {
@@ -282,7 +282,7 @@ function sortDataArray(arr) {
             valA = new Date(a.created_at || 0).getTime();
             valB = new Date(b.created_at || 0).getTime();
         }
-        
+
         if (valA < valB) return currentSortOrder === 'asc' ? -1 : 1;
         if (valA > valB) return currentSortOrder === 'asc' ? 1 : -1;
         return 0;
@@ -296,7 +296,7 @@ async function loadItems() {
         if (showHiddenFiles) url += '&show_hidden=1';
         const res = await fetch(url);
         const data = await res.json();
-        
+
         if (data.status === 'success') {
             const sortedFolders = sortDataArray(data.folders || []);
             const sortedFiles = sortDataArray(data.files || []);
@@ -314,14 +314,14 @@ async function loadItems() {
 function renderItems(folders, files) {
     const tbody = document.getElementById('item-list');
     tbody.innerHTML = '';
-    
+
     // Helper to format date
     const formatDate = (dateString) => {
         if (!dateString) return '-';
         const d = new Date(dateString);
-        return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+        return d.toLocaleDateString('fr-FR') + ' ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
     };
-    
+
     // Load column preferences
     const cols = JSON.parse(localStorage.getItem('mega_cols')) || { tag: true, date: true, mod: true, type: true, size: true, version: true, duration: true, location: true };
     const classTag = cols.tag ? '' : 'hidden-col';
@@ -346,7 +346,7 @@ function renderItems(folders, files) {
         tr.dataset.name = folder.name;
         tr.dataset.type = 'folder';
         tr.dataset.isHidden = folder.is_hidden;
-        
+
         tr.innerHTML = `
             <td class="col-checkbox"><input type="checkbox" class="row-checkbox"></td>
             <td class="col-name folder-name-clickable" style="cursor: pointer;">
@@ -367,18 +367,18 @@ function renderItems(folders, files) {
             <td class="col-location ${classLocation}"><a href="#" style="color: #3b82f6; text-decoration: underline;">${i18n.t('cloud_drive', 'Disque Cloud')}</a></td>
             <td class="col-actions"><i class="fa-solid fa-ellipsis row-action-btn"></i></td>
         `;
-        
+
         // Click on name to open folder
         const nameCell = tr.querySelector('.folder-name-clickable');
         nameCell.addEventListener('click', (e) => {
             e.stopPropagation(); // prevent row selection
             navigateToFolder(folder.id, folder.name);
         });
-        
+
         // Double click to open folder
         tr.addEventListener('dblclick', () => navigateToFolder(folder.id, folder.name));
         tr.addEventListener('contextmenu', (e) => showContextMenu(e, folder.id, folder.name, 'folder', folder.is_hidden));
-        
+
         tbody.appendChild(tr);
     });
 
@@ -391,7 +391,7 @@ function renderItems(folders, files) {
         tr.dataset.type = 'file';
         tr.dataset.encrypted_key = file.encrypted_key;
         tr.dataset.isHidden = file.is_hidden;
-        
+
         tr.innerHTML = `
             <td class="col-checkbox"><input type="checkbox" class="row-checkbox"></td>
             <td class="col-name">
@@ -412,13 +412,13 @@ function renderItems(folders, files) {
             <td class="col-location ${classLocation}"><a href="#" style="color: #3b82f6; text-decoration: underline;">${i18n.t('cloud_drive', 'Disque Cloud')}</a></td>
             <td class="col-actions"><i class="fa-solid fa-ellipsis row-action-btn"></i></td>
         `;
-        
+
         tr.addEventListener('dblclick', async () => {
             const ext = file.name.split('.').pop().toLowerCase();
             const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
             const isVideo = ['mp4', 'webm', 'mov'].includes(ext);
             const isMedia = isImage || isVideo;
-            
+
             if (!file.encrypted_key || file.encrypted_key === 'null' || file.encrypted_key === 'undefined' || file.encrypted_key === '') {
                 if (isMedia) {
                     showMediaViewer(file.name, `api/files.php?action=download&id=${file.id}`, isVideo);
@@ -427,7 +427,7 @@ function renderItems(folders, files) {
                 }
                 return;
             }
-            
+
             if (isMedia) {
                 document.getElementById('modal-media-viewer').classList.add('active');
                 document.getElementById('media-viewer-title').textContent = file.name;
@@ -443,9 +443,9 @@ function renderItems(folders, files) {
                 const response = await fetch(`api/files.php?action=download&id=${file.id}`);
                 const encryptedBlob = await response.blob();
                 const decryptedBlob = await decryptFile(encryptedBlob, keys.fileKeyBytes, keys.ivBytes);
-                
+
                 const url = window.URL.createObjectURL(decryptedBlob);
-                
+
                 if (isMedia) {
                     document.getElementById('media-viewer-loader').classList.add('hidden');
                     showMediaViewer(file.name, url, isVideo, true);
@@ -467,14 +467,14 @@ function renderItems(folders, files) {
                 showNotification(i18n.t('error_decrypt', 'Erreur de déchiffrement'), 'error');
             }
         });
-        
+
         tr.addEventListener('contextmenu', (e) => showContextMenu(e, file.id, file.name, 'file', file.is_hidden));
         tbody.appendChild(tr);
     });
-    
+
     // Attach selection logic
     attachSelectionLogic();
-    
+
     // Observe thumbnails
     document.querySelectorAll('.lazy-thumbnail').forEach(el => thumbnailObserver.observe(el));
 }
@@ -495,7 +495,7 @@ function navigateToBreadcrumb(index) {
 function updateBreadcrumbs() {
     const breadcrumbs = document.getElementById('breadcrumbs');
     breadcrumbs.innerHTML = '';
-    
+
     breadcrumbPath.forEach((item, index) => {
         const span = document.createElement('span');
         if (index === 0) {
@@ -503,7 +503,7 @@ function updateBreadcrumbs() {
         } else {
             span.textContent = item.name;
         }
-        
+
         if (index === breadcrumbPath.length - 1) {
             span.classList.add('current');
         } else {
@@ -511,7 +511,7 @@ function updateBreadcrumbs() {
         }
 
         breadcrumbs.appendChild(span);
-        
+
         if (index < breadcrumbPath.length - 1) {
             const separator = document.createElement('span');
             separator.textContent = ' > ';
@@ -543,7 +543,7 @@ document.getElementById('submit-folder').addEventListener('click', async () => {
             body: JSON.stringify({ name, parent_id: currentFolderId })
         });
         const data = await res.json();
-        
+
         if (data.status === 'success') {
             showNotification(i18n.t('folder_created', 'Dossier créé'), 'success');
             newFolderModal.classList.remove('active');
@@ -587,7 +587,7 @@ window.addEventListener('dragleave', (e) => {
 window.addEventListener('drop', (e) => {
     e.preventDefault();
     dragOverlay.style.opacity = '0';
-    
+
     if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
         uploadFiles(e.dataTransfer.files);
     }
@@ -609,15 +609,15 @@ function createThumbnailBlob(file, maxSize = 256) {
         if (!file.type.startsWith('image/')) {
             return resolve(null);
         }
-        
+
         const img = new Image();
         const url = URL.createObjectURL(file);
-        
+
         img.onload = () => {
             URL.revokeObjectURL(url);
             let width = img.width;
             let height = img.height;
-            
+
             if (width > maxSize || height > maxSize) {
                 if (width > height) {
                     height = Math.round((height * maxSize) / width);
@@ -627,23 +627,23 @@ function createThumbnailBlob(file, maxSize = 256) {
                     height = maxSize;
                 }
             }
-            
+
             const canvas = document.createElement('canvas');
             canvas.width = width;
             canvas.height = height;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
-            
+
             canvas.toBlob((blob) => {
                 resolve(blob || null);
             }, 'image/jpeg', 0.8);
         };
-        
+
         img.onerror = () => {
             URL.revokeObjectURL(url);
             resolve(null);
         };
-        
+
         img.src = url;
     });
 }
@@ -657,14 +657,14 @@ async function uploadFiles(files) {
 
     for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        
+
         try {
             tmFilename.textContent = file.name;
             tmPercentage.textContent = '0%';
             tmSpeed.textContent = i18n.t('encrypting', 'Chiffrement...');
             tmFill.style.width = '0%';
             tmModal.classList.add('active');
-            
+
             // Client-Side Encryption
             const { fileKey, iv } = generateFileKeyAndIV();
             const encryptedBlob = await encryptFile(file, fileKey, iv);
@@ -673,7 +673,7 @@ async function uploadFiles(files) {
             const formData = new FormData();
             formData.append('file', new File([encryptedBlob], file.name, { type: file.type }));
             formData.append('encrypted_key', encryptedKeyData);
-            
+
             // Thumbnail generation and encryption
             const thumbBlob = await createThumbnailBlob(file);
             if (thumbBlob) {
@@ -683,7 +683,7 @@ async function uploadFiles(files) {
                 const finalThumbBlob = new Blob([thumbIv, encryptedThumb], { type: 'application/octet-stream' });
                 formData.append('thumbnail', finalThumbBlob, 'thumb.enc');
             }
-            
+
             if (currentFolderId !== null) {
                 formData.append('folder_id', currentFolderId);
             }
@@ -691,16 +691,16 @@ async function uploadFiles(files) {
             await new Promise((resolve, reject) => {
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', 'api/files.php?action=upload', true);
-                
+
                 let startTime = Date.now();
                 let lastLoaded = 0;
-                
+
                 xhr.upload.onprogress = (e) => {
                     if (e.lengthComputable) {
                         const percentComplete = Math.round((e.loaded / e.total) * 100);
                         tmPercentage.textContent = `${percentComplete}%`;
                         tmFill.style.width = `${percentComplete}%`;
-                        
+
                         const now = Date.now();
                         const timeDiff = (now - startTime) / 1000;
                         if (timeDiff > 0.5) {
@@ -711,7 +711,7 @@ async function uploadFiles(files) {
                         }
                     }
                 };
-                
+
                 xhr.onload = () => {
                     if (xhr.status === 200) {
                         try {
@@ -729,15 +729,15 @@ async function uploadFiles(files) {
                         reject(new Error(`HTTP Error ${xhr.status}`));
                     }
                 };
-                
+
                 xhr.onerror = () => reject(new Error("Network Error"));
                 xhr.send(formData);
             });
-            
+
             setTimeout(() => {
                 tmModal.classList.remove('active');
             }, 2000);
-            
+
         } catch (e) {
             console.error(e);
             showNotification(i18n.t('error_local', 'Erreur locale pour') + ` ${file.name}: ${e.message}`, 'error');
@@ -755,7 +755,7 @@ const userMenuModal = document.getElementById('modal-user-menu');
 userMenuBtn.addEventListener('click', async (e) => {
     e.stopPropagation();
     userMenuModal.classList.toggle('hidden');
-    
+
     if (!userMenuModal.classList.contains('hidden')) {
         // Fetch stats
         updateStorageUI();
@@ -770,21 +770,21 @@ async function updateStorageUI() {
             const used = data.stats.used_storage;
             const total = data.stats.total_storage;
             const percentage = Math.min((used / total) * 100, 100);
-            
+
             const storageTextDropdown = document.getElementById('storage-text');
             const storageFillDropdown = document.getElementById('storage-fill');
             const storageUsedTextSidebar = document.getElementById('storage-used-text');
             const storageBarFillSidebar = document.getElementById('storage-bar-fill');
-            
+
             const textContent = `${formatSize(used)} ${i18n.t('storage_out_of', 'sur')} ${formatSize(total)} ${i18n.t('storage_used', 'utilisés')}`;
-            
+
             if (storageTextDropdown) storageTextDropdown.textContent = textContent;
             if (storageFillDropdown) storageFillDropdown.style.width = `${percentage}%`;
-            
+
             if (storageUsedTextSidebar) storageUsedTextSidebar.textContent = textContent;
             if (storageBarFillSidebar) storageBarFillSidebar.style.width = `${percentage}%`;
         }
-    } catch(e) {
+    } catch (e) {
         console.error("Erreur stats storage", e);
     }
 }
@@ -808,10 +808,10 @@ if (dropdownAvatarBtn && avatarUploadInput) {
     avatarUploadInput.addEventListener('change', async (e) => {
         const file = e.target.files[0];
         if (!file) return;
-        
+
         const formData = new FormData();
         formData.append('avatar', file);
-        
+
         showNotification(i18n.t('uploading_image', "Envoi de l'image..."), 'info');
         try {
             const res = await fetch('api/upload_avatar.php', {
@@ -819,17 +819,17 @@ if (dropdownAvatarBtn && avatarUploadInput) {
                 body: formData
             });
             const data = await res.json();
-            
+
             if (data.status === 'success') {
                 showNotification(data.message, 'success');
                 initAuth(); // Reload avatar
             } else {
                 showNotification(data.message, 'error');
             }
-        } catch(err) {
+        } catch (err) {
             showNotification(i18n.t('error_upload_network', "Erreur réseau lors de l'upload."), 'error');
         }
-        
+
         // Reset input
         avatarUploadInput.value = '';
     });
@@ -849,7 +849,7 @@ document.getElementById('form-password-change').addEventListener('submit', async
     e.preventDefault();
     const old_password = document.getElementById('old-pass').value;
     const new_password = document.getElementById('new-pass').value;
-    
+
     try {
         const res = await fetch('api/user.php?action=change_password', {
             method: 'POST',
@@ -857,11 +857,11 @@ document.getElementById('form-password-change').addEventListener('submit', async
             body: JSON.stringify({ old_password, new_password })
         });
         const data = await res.json();
-        
+
         if (data.status === 'success') {
             showNotification(i18n.t('password_updated', 'Mot de passe mis à jour.'), 'success');
             document.getElementById('form-password-change').reset();
-            
+
             // Re-derive master key so we don't break encryption
             const newMasterKey = await deriveMasterKey(new_password);
             sessionStorage.setItem('master_key', newMasterKey);
@@ -886,12 +886,12 @@ let ctxTarget = null;
 function showContextMenu(e, id, name, type, isHidden = 0) {
     e.preventDefault();
     ctxTarget = { id, name, type, isHidden };
-    
+
     // Position menu
     contextMenu.style.left = `${e.pageX}px`;
     contextMenu.style.top = `${e.pageY}px`;
     contextMenu.classList.remove('hidden');
-    
+
     // Toggle options based on type and view
     const btnDownload = document.getElementById('ctx-download');
     const btnShare = document.getElementById('ctx-share');
@@ -899,21 +899,21 @@ function showContextMenu(e, id, name, type, isHidden = 0) {
     const btnFav = document.getElementById('ctx-favorite');
     const btnDel = document.getElementById('ctx-delete');
     const btnRestore = document.getElementById('ctx-restore');
-    
+
     if (currentView === 'trash') {
         btnDownload.style.display = 'none';
         btnShare.style.display = 'none';
         btnRename.style.display = 'none';
         btnFav.style.display = 'none';
         btnDel.style.display = 'none';
-        if(btnRestore) btnRestore.classList.remove('hidden');
+        if (btnRestore) btnRestore.classList.remove('hidden');
     } else {
         btnDownload.style.display = type === 'folder' ? 'none' : 'flex';
         btnShare.style.display = 'flex';
         btnRename.style.display = 'flex';
         btnFav.style.display = 'flex';
         btnDel.style.display = 'flex';
-        if(btnRestore) btnRestore.classList.add('hidden');
+        if (btnRestore) btnRestore.classList.add('hidden');
     }
 
     const btnHide = document.getElementById('ctx-hide');
@@ -921,11 +921,11 @@ function showContextMenu(e, id, name, type, isHidden = 0) {
         const icon = btnHide.querySelector('i');
         const text = btnHide.querySelector('span[data-i18n="ctx_hide"]');
         if (isHidden == 1) {
-            if(icon) { icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
-            if(text) text.textContent = i18n.t('ctx_unhide', 'Afficher');
+            if (icon) { icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
+            if (text) text.textContent = i18n.t('ctx_unhide', 'Afficher');
         } else {
-            if(icon) { icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
-            if(text) text.textContent = i18n.t('ctx_hide', 'Cacher');
+            if (icon) { icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+            if (text) text.textContent = i18n.t('ctx_hide', 'Cacher');
         }
     }
 }
@@ -942,18 +942,18 @@ document.addEventListener('click', (e) => {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ targets, color_tag: color })
             })
-            .then(res => res.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    showNotification(data.message, 'success');
-                    loadItems(); // reload to show new tag
-                } else {
-                    showNotification(data.message, 'error');
-                }
-            });
+                .then(res => res.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        showNotification(data.message, 'success');
+                        loadItems(); // reload to show new tag
+                    } else {
+                        showNotification(data.message, 'error');
+                    }
+                });
         }
     }
-    
+
     contextMenu.classList.add('hidden');
 });
 
@@ -961,12 +961,12 @@ document.getElementById('ctx-download').addEventListener('click', async () => {
     if (ctxTarget && ctxTarget.type === 'file') {
         const card = document.querySelector(`.item-row[data-type="${ctxTarget.type}"][data-id="${ctxTarget.id}"]`);
         const encryptedKey = card ? card.dataset.encrypted_key : null;
-        
+
         if (!encryptedKey || encryptedKey === 'null' || encryptedKey === 'undefined' || encryptedKey === '') {
             window.open(`api/files.php?action=download&id=${ctxTarget.id}`, '_blank');
             return;
         }
-        
+
         showNotification('Déchiffrement en cours...', 'info');
         try {
             const masterKeyHex = sessionStorage.getItem('master_key');
@@ -974,7 +974,7 @@ document.getElementById('ctx-download').addEventListener('click', async () => {
             const response = await fetch(`api/files.php?action=download&id=${ctxTarget.id}`);
             const encryptedBlob = await response.blob();
             const decryptedBlob = await decryptFile(encryptedBlob, keys.fileKeyBytes, keys.ivBytes);
-            
+
             const url = window.URL.createObjectURL(decryptedBlob);
             const a = document.createElement('a');
             a.href = url;
@@ -995,7 +995,7 @@ document.getElementById('ctx-rename').addEventListener('click', async () => {
     if (!ctxTarget) return;
     const newName = prompt(i18n.t('prompt_rename', 'Renommer "%s" en :').replace('%s', ctxTarget.name), ctxTarget.name);
     if (!newName || newName === ctxTarget.name) return;
-    
+
     const endpoint = ctxTarget.type === 'file' ? 'api/files.php?action=rename' : 'api/folders.php?action=rename';
     try {
         const res = await fetch(endpoint, {
@@ -1018,77 +1018,77 @@ document.getElementById('ctx-rename').addEventListener('click', async () => {
 
 document.getElementById('ctx-share').addEventListener('click', async () => {
     if (!ctxTarget) return;
-    
+
     try {
         const masterKeyHex = sessionStorage.getItem('master_key');
         if (!masterKeyHex) throw new Error("No master key");
-        
+
         let shareUrl = '';
-        
+
         if (ctxTarget.type === 'file') {
             const card = document.querySelector(`.item-row[data-type="file"][data-id="${ctxTarget.id}"]`);
             const encryptedKey = card ? card.dataset.encrypted_key : null;
-            
+
             if (!encryptedKey || encryptedKey === 'null' || encryptedKey === 'undefined' || encryptedKey === '') {
                 showNotification(i18n.t('error_file_unencrypted', "Ce fichier a été envoyé avant la mise à jour (non chiffré)."), "error");
                 return;
             }
-            
+
             const keys = await decryptKeyData(encryptedKey, masterKeyHex);
             const hashPayload = bufferToHex(keys.fileKeyBytes) + ':' + bufferToHex(keys.ivBytes);
-            
+
             const res = await fetch('api/files.php?action=share', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id: ctxTarget.id })
             });
             const data = await res.json();
-            
+
             if (data.status === 'success') {
                 const _basePath1 = window.location.pathname.replace(/\/[^\/]*$/, '');
                 shareUrl = `${window.location.origin}${_basePath1}/share.html?token=${data.token}#${hashPayload}`;
             } else {
                 throw new Error(data.message);
             }
-            
+
         } else if (ctxTarget.type === 'folder') {
             showNotification(i18n.t('share_prep_folder', "Préparation du partage de dossier..."), "info");
-            
+
             // 1. Get all files in this folder recursively
             const resFiles = await fetch(`api/folders.php?action=get_all_files&folder_id=${ctxTarget.id}`, { method: 'POST' });
             const dataFiles = await resFiles.json();
-            
+
             if (dataFiles.status !== 'success') throw new Error(i18n.t('error_fetch_files', "Erreur récupération fichiers"));
-            
+
             // 2. Generate Folder Share Key (32 bytes)
             const folderShareKey = crypto.getRandomValues(new Uint8Array(32));
             const folderShareKeyHex = bufferToHex(folderShareKey);
-            
+
             // 3. Rewrap keys
             const rewrappedKeys = {};
             for (let f of dataFiles.files) {
                 if (!f.encrypted_key || f.encrypted_key === 'null') continue;
-                
+
                 // Decrypt with master key
                 const fileKeys = await decryptKeyData(f.encrypted_key, masterKeyHex);
-                
+
                 // Encrypt with folder share key
                 const fileKeyDataBytes = new Uint8Array(fileKeys.fileKeyBytes.length + fileKeys.ivBytes.length);
                 fileKeyDataBytes.set(fileKeys.fileKeyBytes, 0);
                 fileKeyDataBytes.set(fileKeys.ivBytes, fileKeys.fileKeyBytes.length);
-                
+
                 const iv = crypto.getRandomValues(new Uint8Array(12));
                 const keyObj = await crypto.subtle.importKey(
                     'raw', folderShareKey, { name: 'AES-GCM' }, false, ['encrypt']
                 );
-                
+
                 const encryptedData = await crypto.subtle.encrypt(
                     { name: 'AES-GCM', iv: iv }, keyObj, fileKeyDataBytes
                 );
-                
+
                 rewrappedKeys[f.id] = bufferToHex(iv) + ':' + bufferToHex(new Uint8Array(encryptedData));
             }
-            
+
             // 4. Send to server
             const resShare = await fetch('api/folders.php?action=share', {
                 method: 'POST',
@@ -1096,7 +1096,7 @@ document.getElementById('ctx-share').addEventListener('click', async () => {
                 body: JSON.stringify({ id: ctxTarget.id, keys: rewrappedKeys })
             });
             const dataShare = await resShare.json();
-            
+
             if (dataShare.status === 'success') {
                 const _basePath2 = window.location.pathname.replace(/\/[^\/]*$/, '');
                 shareUrl = `${window.location.origin}${_basePath2}/share.html?token=${dataShare.token}#${folderShareKeyHex}`;
@@ -1104,56 +1104,56 @@ document.getElementById('ctx-share').addEventListener('click', async () => {
                 throw new Error(dataShare.message);
             }
         }
-        
+
         // Show Mega Modal
         if (shareUrl) {
             document.getElementById('share-modal-filename').textContent = ctxTarget.name;
             document.getElementById('share-link-input').value = shareUrl;
-            
+
             // Reset Views
             document.getElementById('share-main-view').style.display = 'block';
             document.getElementById('share-settings-view').style.display = 'none';
-            
+
             // Init advanced settings
             document.getElementById('enable-separate-key').checked = false;
             document.getElementById('main-view-key-container').style.display = 'none';
             document.getElementById('btn-copy-key-main').style.display = 'none';
             document.getElementById('main-share-key-input').value = shareUrl.split('#')[1] || '';
-            
+
             document.getElementById('enable-password').checked = false;
             document.getElementById('password-container').style.display = 'none';
             document.getElementById('share-password-input').value = '';
-            
+
             document.getElementById('enable-expiry').checked = false;
             document.getElementById('expiry-container').style.display = 'none';
             document.getElementById('share-expiry-input').value = '';
-            
+
             // Check Pro status for advanced settings
             if (window.userPlanType === 'free') {
                 document.getElementById('expiry-toggle-wrapper').style.display = 'none';
                 document.getElementById('expiry-pro-badge').style.display = 'block';
-                
+
                 document.getElementById('password-toggle-wrapper').style.display = 'none';
                 document.getElementById('password-pro-badge').style.display = 'block';
             } else {
                 document.getElementById('expiry-toggle-wrapper').style.display = 'inline-block';
                 document.getElementById('expiry-pro-badge').style.display = 'none';
-                
+
                 document.getElementById('password-toggle-wrapper').style.display = 'inline-block';
                 document.getElementById('password-pro-badge').style.display = 'none';
             }
-            
+
             document.getElementById('modal-share').classList.add('active');
-            
+
             document.getElementById('btn-copy-link').onclick = async () => {
                 try {
                     await navigator.clipboard.writeText(shareUrl);
                     showNotification(i18n.t('link_copied', "Lien copié !"), "success");
-                } catch(e) {}
+                } catch (e) { }
             };
             document.getElementById('btn-copy-link-icon').onclick = document.getElementById('btn-copy-link').onclick;
         }
-        
+
     } catch (e) {
         console.error(e);
         showNotification(e.message || i18n.t('error_share_gen', "Erreur lors de la génération du partage"), "error");
@@ -1182,13 +1182,13 @@ document.getElementById('btn-cancel-settings').addEventListener('click', closeSe
 // Advanced Share Settings Listeners
 document.getElementById('enable-separate-key').addEventListener('change', (e) => {
     const isSeparate = e.target.checked;
-    
+
     document.getElementById('main-view-key-container').style.display = isSeparate ? 'block' : 'none';
     document.getElementById('btn-copy-key-main').style.display = isSeparate ? 'inline-block' : 'none';
-    
+
     const linkInput = document.getElementById('share-link-input');
     const currentUrl = linkInput.value;
-    
+
     if (isSeparate) {
         if (currentUrl.includes('#')) {
             linkInput.value = currentUrl.split('#')[0];
@@ -1205,14 +1205,14 @@ document.getElementById('btn-copy-key-icon').addEventListener('click', async () 
     try {
         await navigator.clipboard.writeText(document.getElementById('main-share-key-input').value);
         showNotification(i18n.t('key_copied', "Clé copiée !"), "success");
-    } catch(e) {}
+    } catch (e) { }
 });
 
 document.getElementById('btn-copy-key-main').addEventListener('click', async () => {
     try {
         await navigator.clipboard.writeText(document.getElementById('main-share-key-input').value);
         showNotification(i18n.t('key_copied', "Clé copiée !"), "success");
-    } catch(e) {}
+    } catch (e) { }
 });
 
 document.getElementById('enable-password').addEventListener('change', (e) => {
@@ -1235,10 +1235,10 @@ document.getElementById('btn-save-share-settings').addEventListener('click', asy
     const btn = document.getElementById('btn-save-share-settings');
     const pwd = document.getElementById('enable-password').checked ? document.getElementById('share-password-input').value : '';
     const exp = document.getElementById('enable-expiry').checked ? document.getElementById('share-expiry-input').value : '';
-    
+
     const endpoint = ctxTarget.type === 'file' ? 'api/files.php?action=share' : 'api/folders.php?action=share';
     btn.textContent = i18n.t('saving', 'Enregistrement...');
-    
+
     try {
         const res = await fetch(endpoint, {
             method: 'POST',
@@ -1252,7 +1252,7 @@ document.getElementById('btn-save-share-settings').addEventListener('click', asy
         } else {
             showNotification(data.message || i18n.t('error_saving', 'Erreur lors de la sauvegarde'), 'error');
         }
-    } catch(e) {
+    } catch (e) {
         showNotification('Erreur réseau', 'error');
     } finally {
         btn.textContent = i18n.t('apply', 'Appliquer');
@@ -1267,9 +1267,9 @@ function attachSelectionLogic() {
     const checkAll = document.getElementById('check-all');
     const selectionBar = document.getElementById('selection-bar');
     const selectionCount = document.getElementById('selection-count');
-    
+
     selectedItems.clear();
-    
+
     const selDownload = document.getElementById('sel-download');
     const selShare = document.getElementById('sel-share');
     const selMove = document.getElementById('sel-move');
@@ -1283,13 +1283,13 @@ function attachSelectionLogic() {
             selectionBar.classList.remove('hidden');
             selectionCount.textContent = `${selectedItems.size} ${i18n.t('selected_items', 'sélectionné(s)')}`;
             checkAll.checked = selectedItems.size === rows.length && rows.length > 0;
-            
+
             if (selectedItems.size > 1) {
-                if(selShare) selShare.style.display = 'inline-block';
-                if(selRename) selRename.style.display = 'none';
+                if (selShare) selShare.style.display = 'inline-block';
+                if (selRename) selRename.style.display = 'none';
             } else {
-                if(selShare) selShare.style.display = 'inline-block';
-                if(selRename) selRename.style.display = 'inline-block';
+                if (selShare) selShare.style.display = 'inline-block';
+                if (selRename) selRename.style.display = 'inline-block';
             }
         } else {
             selectionBar.classList.add('hidden');
@@ -1299,7 +1299,7 @@ function attachSelectionLogic() {
 
     rows.forEach(row => {
         const checkbox = row.querySelector('.row-checkbox');
-        
+
         // Clicking checkbox toggles selection
         checkbox.addEventListener('change', (e) => {
             if (e.target.checked) {
@@ -1318,7 +1318,7 @@ function attachSelectionLogic() {
             checkbox.checked = !checkbox.checked;
             checkbox.dispatchEvent(new Event('change'));
         });
-        
+
         // Three dots button opens context menu
         const btn = row.querySelector('.row-action-btn');
         if (btn) {
@@ -1349,7 +1349,7 @@ function attachSelectionLogic() {
         checkAll.checked = false;
         checkAll.dispatchEvent(new Event('change'));
     });
-    
+
     // Wire selection action buttons for Single Actions
     const triggerSingleAction = (ctxId) => {
         if (selectedItems.size !== 1) return;
@@ -1357,7 +1357,7 @@ function attachSelectionLogic() {
         ctxTarget = { id: row.dataset.id, name: row.dataset.name, type: row.dataset.type };
         document.getElementById(ctxId).click();
     };
-    
+
     if (selShare) {
         const newSelShare = selShare.cloneNode(true);
         selShare.parentNode.replaceChild(newSelShare, selShare);
@@ -1369,13 +1369,13 @@ function attachSelectionLogic() {
             }
         });
     }
-    
+
     if (selRename) {
         const newSelRename = selRename.cloneNode(true);
         selRename.parentNode.replaceChild(newSelRename, selRename);
         newSelRename.addEventListener('click', () => triggerSingleAction('ctx-rename'));
     }
-    
+
     if (selMove) {
         const newSelMove = selMove.cloneNode(true);
         selMove.parentNode.replaceChild(newSelMove, selMove);
@@ -1411,7 +1411,7 @@ function attachSelectionLogic() {
             }
             const confirmed = await showConfirmModal(i18n.t('confirm_delete_title', 'Confirmation de suppression'), `${i18n.t('confirm_delete_multi', 'Voulez-vous vraiment supprimer ces')} ${selectedItems.size} ${i18n.t('items_question', 'élément(s) ?')}`);
             if (!confirmed) return;
-            
+
             showNotification(i18n.t('deleting', 'Suppression en cours...'), 'info');
             let successCount = 0;
             for (let row of selectedItems) {
@@ -1423,7 +1423,7 @@ function attachSelectionLogic() {
                     });
                     const data = await res.json();
                     if (data.status === 'success') successCount++;
-                } catch(e) {}
+                } catch (e) { }
             }
             showNotification(`${successCount} ${i18n.t('items_deleted', 'élément(s) supprimé(s).')}`, 'success');
             loadItems();
@@ -1441,13 +1441,33 @@ function attachSelectionLogic() {
                 ctxTarget = { id: row.dataset.id, name: row.dataset.name, type: row.dataset.type };
                 document.getElementById('ctx-download').click();
                 // Adding a slight delay to prevent browser from blocking multiple popups
-                await new Promise(r => setTimeout(r, 1000)); 
+                await new Promise(r => setTimeout(r, 1000));
             }
         });
     }
 }
 
-// Sidebar Navigation
+// Fonction globale pour tout cacher avant d'afficher la bonne vue
+function hideAllViews() {
+    const fileManager = document.getElementById('file-manager');
+    const viewDevices = document.getElementById('view-devices');
+    const viewShared = document.getElementById('view-shared');
+    const viewObject = document.getElementById('view-object');
+    const actionBar = document.querySelector('.action-bar-mega');
+    const breadcrumbs = document.querySelector('.breadcrumbs-mega');
+    const topbarSearch = document.querySelector('.topbar-search');
+
+    if (fileManager) fileManager.classList.add('hidden');
+    if (viewDevices) viewDevices.classList.add('hidden');
+    if (viewShared) viewShared.classList.add('hidden');
+    if (viewObject) viewObject.classList.add('hidden');
+
+    if (actionBar) actionBar.style.display = 'none';
+    if (breadcrumbs) breadcrumbs.style.display = 'none';
+    if (topbarSearch) topbarSearch.style.visibility = 'hidden';
+}
+
+// Sidebar Navigation Unifiée
 const navItems = document.querySelectorAll('.sidebar-nav .nav-item');
 navItems.forEach(item => {
     item.addEventListener('click', (e) => {
@@ -1455,33 +1475,100 @@ navItems.forEach(item => {
             e.preventDefault();
             return;
         }
-        
+        e.preventDefault();
+
+        // Gérer la classe 'active' sur le menu
         navItems.forEach(n => n.classList.remove('active'));
         item.classList.add('active');
-        
+
+        // Tout cacher par défaut
+        hideAllViews();
+
         const id = item.id;
-        if (id === 'nav-drive') currentView = 'drive';
-        else if (id === 'nav-media') currentView = 'media';
-        else if (id === 'nav-shared') currentView = 'shared';
-        else if (id === 'nav-recent') currentView = 'recent';
-        else if (id === 'nav-favorites') currentView = 'favorites';
-        else if (id === 'nav-trash') currentView = 'trash';
-        
-        // Update Title
-        document.getElementById('breadcrumbs').textContent = item.textContent.trim();
-        breadcrumbPath = [{ id: null, name: item.textContent.trim() }];
-        currentFolderId = null;
-        
-        // Toggle action buttons
-        if (currentView === 'trash') {
-            document.getElementById('action-buttons-default').classList.add('hidden');
-            document.getElementById('action-buttons-trash').classList.remove('hidden');
-        } else {
-            document.getElementById('action-buttons-default').classList.remove('hidden');
-            document.getElementById('action-buttons-trash').classList.add('hidden');
+
+        // 1. Vues standards (Gestionnaire de fichiers)
+        if (['nav-drive', 'nav-media', 'nav-recent', 'nav-favorites', 'nav-trash'].includes(id)) {
+
+            // Réafficher les éléments du gestionnaire
+            document.getElementById('file-manager')?.classList.remove('hidden');
+
+            const actionBar = document.querySelector('.action-bar-mega');
+            if (actionBar) actionBar.style.display = 'flex';
+
+            const breadcrumbs = document.querySelector('.breadcrumbs-mega');
+            if (breadcrumbs) breadcrumbs.style.display = 'block';
+
+            // Correction de la classe (c'est .search-container dans topbar.php)
+            const searchContainer = document.querySelector('.search-container');
+            if (searchContainer) searchContainer.style.visibility = 'visible';
+
+            // Définir la vue actuelle
+            if (id === 'nav-drive') currentView = 'drive';
+            else if (id === 'nav-media') currentView = 'media';
+            else if (id === 'nav-recent') currentView = 'recent';
+            else if (id === 'nav-favorites') currentView = 'favorites';
+            else if (id === 'nav-trash') currentView = 'trash';
+
+            // Mettre à jour le fil d'Ariane
+            document.getElementById('breadcrumbs').textContent = item.textContent.trim();
+            breadcrumbPath = [{ id: null, name: item.textContent.trim() }];
+            currentFolderId = null;
+
+            // Boutons d'action (Corbeille vs Normal)
+            if (currentView === 'trash') {
+                document.getElementById('action-buttons-default').classList.add('hidden');
+                document.getElementById('action-buttons-trash').classList.remove('hidden');
+            } else {
+                document.getElementById('action-buttons-default').classList.remove('hidden');
+                document.getElementById('action-buttons-trash').classList.add('hidden');
+            }
+
+            loadItems();
         }
-        
-        loadItems();
+        // 2. Vues Externes / Spécifiques
+        else if (id === 'nav-devices') {
+            document.getElementById('view-devices')?.classList.remove('hidden');
+        }
+        else if (id === 'nav-object') {
+            document.getElementById('view-object')?.classList.remove('hidden');
+        }
+        else if (id === 'nav-shared') {
+            document.getElementById('view-shared')?.classList.remove('hidden');
+
+            // 1. Réafficher la barre d'action pour retrouver les boutons de vue
+            const actionBar = document.querySelector('.action-bar-mega');
+            if (actionBar) actionBar.style.display = 'flex';
+
+            // 2. Masquer les boutons "Téléverser" et "Nouveau dossier"
+            document.getElementById('action-buttons-default')?.classList.add('hidden');
+            document.getElementById('action-buttons-trash')?.classList.add('hidden');
+
+            loadSharedLinks(); // Ta fonction pour charger les liens
+        }
+    });
+});
+
+// ===========================================================
+// Gestion des onglets internes de la vue "Éléments partagés"
+// ===========================================================
+const sharedTabs = document.querySelectorAll('.shared-tab');
+const sharedPanels = document.querySelectorAll('.shared-content-panel');
+
+sharedTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+        // 1. Retirer la classe 'active' de tous les onglets et panneaux
+        sharedTabs.forEach(t => t.classList.remove('active'));
+        sharedPanels.forEach(p => p.classList.remove('active'));
+
+        // 2. Ajouter 'active' à l'onglet cliqué
+        tab.classList.add('active');
+
+        // 3. Afficher le panneau cible
+        const targetId = tab.getAttribute('data-target');
+        const targetPanel = document.getElementById(targetId);
+        if (targetPanel) {
+            targetPanel.classList.add('active');
+        }
     });
 });
 
@@ -1501,7 +1588,7 @@ document.getElementById('ctx-favorite')?.addEventListener('click', async () => {
             showNotification(data.message, 'success');
             loadItems();
         } else showNotification(data.message, 'error');
-    } catch(e) { showNotification(i18n.t('error', 'Erreur'), 'error'); }
+    } catch (e) { showNotification(i18n.t('error', 'Erreur'), 'error'); }
 });
 
 document.getElementById('ctx-restore')?.addEventListener('click', async () => {
@@ -1519,7 +1606,7 @@ document.getElementById('ctx-restore')?.addEventListener('click', async () => {
             showNotification(data.message, 'success');
             loadItems();
         } else showNotification(data.message, 'error');
-    } catch(e) { showNotification(i18n.t('error', 'Erreur'), 'error'); }
+    } catch (e) { showNotification(i18n.t('error', 'Erreur'), 'error'); }
 });
 
 document.getElementById('btn-empty-trash')?.addEventListener('click', async () => {
@@ -1532,23 +1619,23 @@ document.getElementById('btn-empty-trash')?.addEventListener('click', async () =
             showNotification(data.message, 'success');
             loadItems();
         } else showNotification(data.message, 'error');
-    } catch(e) { showNotification(i18n.t('error', 'Erreur'), 'error'); }
+    } catch (e) { showNotification(i18n.t('error', 'Erreur'), 'error'); }
 });
 
 // Override Delete Context Menu to use Soft Delete (Trash)
 document.getElementById('ctx-delete')?.addEventListener('click', async () => {
     if (!ctxTarget) return;
-    
+
     // Only allow trashing from non-trash views (in trash, use empty trash)
-    if (currentView === 'trash') return; 
-    
+    if (currentView === 'trash') return;
+
     const targets = getTargetsToProcess();
     if (targets.length === 0) return;
-    
+
     const confirmMsg = targets.length > 1 ? i18n.t('confirm_delete_multi', 'Voulez-vous vraiment supprimer ces éléments ?') : i18n.t('confirm_delete_single', 'Voulez-vous vraiment supprimer cet élément ?');
     const confirmed = await showConfirmModal(i18n.t('confirm_delete_title', 'Confirmation de suppression'), confirmMsg);
     if (!confirmed) return;
-    
+
     try {
         const res = await fetch(`api/actions.php?action=trash`, {
             method: 'POST',
@@ -1560,7 +1647,7 @@ document.getElementById('ctx-delete')?.addEventListener('click', async () => {
             showNotification(data.message, 'success');
             loadItems();
         } else showNotification(data.message, 'error');
-    } catch(e) { showNotification(i18n.t('error', 'Erreur'), 'error'); }
+    } catch (e) { showNotification(i18n.t('error', 'Erreur'), 'error'); }
 });
 
 // Hide context menu item (Pro Upsell or Toggle Hidden)
@@ -1583,7 +1670,7 @@ document.getElementById('ctx-hide')?.addEventListener('click', async () => {
                 showNotification(data.message, 'success');
                 loadItems();
             } else showNotification(data.message, 'error');
-        } catch(e) { showNotification(i18n.t('error', 'Erreur'), 'error'); }
+        } catch (e) { showNotification(i18n.t('error', 'Erreur'), 'error'); }
     }
 });
 
@@ -1605,31 +1692,31 @@ async function createAndShareZip() {
     const modal = document.getElementById('modal-zip-progress');
     const fill = document.getElementById('zip-progress-fill');
     const status = document.getElementById('zip-status-text');
-    
+
     modal.classList.add('active');
     fill.style.width = '0%';
-    
+
     try {
         const zip = new JSZip();
         const masterKeyHex = sessionStorage.getItem('master_key');
-        
+
         if (!masterKeyHex) throw new Error(i18n.t('error_no_key', "Clé de chiffrement introuvable"));
 
         let processed = 0;
         const total = selectedItems.size;
-        
+
         status.textContent = i18n.t('zip_decrypting', "Déchiffrement et compression en cours...");
-        
+
         for (let row of selectedItems) {
             if (row.dataset.type !== 'file') {
                 processed++;
                 continue;
             }
-            
+
             const fileId = row.dataset.id;
             const fileName = row.dataset.name;
             const encryptedKey = row.dataset.encrypted_key;
-            
+
             if (encryptedKey && encryptedKey !== 'null' && encryptedKey !== 'undefined') {
                 try {
                     const keys = await decryptKeyData(encryptedKey, masterKeyHex);
@@ -1642,7 +1729,7 @@ async function createAndShareZip() {
                     const encryptedBlob = await response.blob();
                     const decryptedBlob = await decryptFile(encryptedBlob, keys.fileKeyBytes, keys.ivBytes);
                     zip.file(fileName, decryptedBlob);
-                } catch(err) {
+                } catch (err) {
                     console.warn(`Fichier ignoré (erreur de déchiffrement): ${fileName}`, err);
                 }
             } else {
@@ -1652,25 +1739,25 @@ async function createAndShareZip() {
                         const blob = await response.blob();
                         zip.file(fileName, blob);
                     }
-                } catch(err) {
+                } catch (err) {
                     console.warn(`Fichier ignoré (erreur réseau): ${fileName}`, err);
                 }
             }
-            
+
             processed++;
-            fill.style.width = `${(processed / total) * 50}%`; 
+            fill.style.width = `${(processed / total) * 50}%`;
         }
 
         status.textContent = i18n.t('zip_generating', "Génération de l'archive...");
-        const zipBlob = await zip.generateAsync({type:"blob", compression: "STORE"}); 
-        
+        const zipBlob = await zip.generateAsync({ type: "blob", compression: "STORE" });
+
         status.textContent = i18n.t('zip_encrypting', "Chiffrement de l'archive...");
         const { fileKey, iv } = generateFileKeyAndIV();
         const encryptedZipBlob = await encryptFile(zipBlob, fileKey, iv);
         const encryptedKeyData = await encryptKeyData(fileKey, iv, masterKeyHex);
-        
+
         status.textContent = i18n.t('zip_searching_folder', "Recherche du dossier d'archives...");
-        
+
         let archiveFolderId = null;
         try {
             const fRes = await fetch('api/folders.php?action=list&view=drive');
@@ -1689,65 +1776,65 @@ async function createAndShareZip() {
                     if (cData.status === 'success') archiveFolderId = cData.folder.id;
                 }
             }
-        } catch(e) {
+        } catch (e) {
             console.warn(i18n.t('error_check_folder', "Erreur lors de la vérification du dossier"), e);
         }
-        
+
         status.textContent = i18n.t('zip_uploading', "Téléversement de l'archive...");
-        
+
         const formData = new FormData();
         const zipFileName = `Archive_Partage_${Date.now()}.zip`;
         const fileForUpload = new File([encryptedZipBlob], zipFileName, { type: 'application/zip' });
-        
+
         formData.append('file', fileForUpload);
         formData.append('encrypted_key', encryptedKeyData);
         if (archiveFolderId) formData.append('folder_id', archiveFolderId);
-        
+
         const uploadRes = await fetch('api/files.php?action=upload', {
             method: 'POST',
             body: formData
         });
-        
+
         const uploadData = await uploadRes.json();
         if (uploadData.status !== 'success') throw new Error(uploadData.message);
-        
+
         fill.style.width = '100%';
         modal.classList.remove('active');
-        
+
         // Clear selection
         document.getElementById('close-selection').click();
-        
+
         // Share the new zip file
         const hashPayload = bufferToHex(fileKey) + ':' + bufferToHex(iv);
-        
+
         const shareRes = await fetch('api/files.php?action=share', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ id: uploadData.file.id })
         });
         const shareData = await shareRes.json();
-        
+
         if (shareData.status === 'success') {
             const _basePath3 = window.location.pathname.replace(/\/[^\/]*$/, '');
             const shareUrl = `${window.location.origin}${_basePath3}/share.html?token=${shareData.token}#${hashPayload}`;
-            
+
             document.getElementById('share-modal-filename').textContent = zipFileName;
             document.getElementById('share-link-input').value = shareUrl;
             document.getElementById('modal-share').classList.add('active');
-            
+
             document.getElementById('btn-copy-link').onclick = async () => {
                 try {
                     await navigator.clipboard.writeText(shareUrl);
                     showNotification("Lien copié !", "success");
-                } catch(e) {}
+                } catch (e) { }
             };
             document.getElementById('btn-copy-link-icon').onclick = document.getElementById('btn-copy-link').onclick;
-            
+
             loadItems();
         } else {
             showNotification(shareData.message, 'error');
         }
-        
+
     } catch (e) {
         console.error(e);
         modal.classList.remove('active');
@@ -1763,15 +1850,15 @@ async function openMoveModal(target) {
     if (target) {
         ctxTarget = target; // From context menu (single item)
     }
-    
+
     // Fetch all folders
     try {
         const res = await fetch('api/folders.php?action=list_all');
         const data = await res.json();
-        
+
         if (data.status === 'success') {
             moveFolderSelect.innerHTML = `<option value="null">${i18n.t('cloud_drive_root', "Disque Cloud (Racine)")}</option>`;
-            
+
             // Build simple flat representation of tree
             const buildTreeOptions = (folders, parentId = null, level = 0) => {
                 const children = folders.filter(f => f.parent_id === parentId);
@@ -1783,13 +1870,13 @@ async function openMoveModal(target) {
                     buildTreeOptions(folders, child.id, level + 1);
                 });
             };
-            
+
             buildTreeOptions(data.folders);
             modalMove.classList.add('active');
         } else {
             showNotification(i18n.t('error_fetch_folders', "Erreur de récupération des dossiers"), "error");
         }
-    } catch(e) {
+    } catch (e) {
         showNotification(i18n.t('error_network', "Erreur réseau"), "error");
     }
 }
@@ -1801,7 +1888,7 @@ document.getElementById('cancel-move').addEventListener('click', () => {
 document.getElementById('submit-move').addEventListener('click', async () => {
     const targetFolderId = moveFolderSelect.value;
     const itemsToMove = [];
-    
+
     if (selectedItems.size > 1) {
         for (let row of selectedItems) {
             itemsToMove.push({ id: row.dataset.id, type: row.dataset.type });
@@ -1809,11 +1896,11 @@ document.getElementById('submit-move').addEventListener('click', async () => {
     } else if (ctxTarget) {
         itemsToMove.push({ id: ctxTarget.id, type: ctxTarget.type });
     }
-    
+
     if (itemsToMove.length === 0) return;
-    
+
     let successCount = 0;
-    
+
     for (let item of itemsToMove) {
         const endpoint = item.type === 'file' ? 'api/files.php?action=move' : 'api/folders.php?action=move';
         try {
@@ -1828,13 +1915,13 @@ document.getElementById('submit-move').addEventListener('click', async () => {
             } else {
                 console.warn(data.message);
             }
-        } catch(e) {
+        } catch (e) {
             console.error(e);
         }
     }
-    
+
     modalMove.classList.remove('active');
-    
+
     if (successCount > 0) {
         showNotification(`${successCount} ${i18n.t('items_moved', 'élément(s) déplacé(s)')}`, "success");
         if (selectedItems.size > 0) document.getElementById('close-selection').click();
@@ -1854,7 +1941,7 @@ function setupPayPal(planType, containerId, amount) {
     if (typeof paypal !== 'undefined' && document.getElementById(containerId)) {
         document.getElementById(containerId).innerHTML = ''; // Clear if exists
         paypal.Buttons({
-            createOrder: function(data, actions) {
+            createOrder: function (data, actions) {
                 return actions.order.create({
                     purchase_units: [{
                         amount: {
@@ -1864,21 +1951,21 @@ function setupPayPal(planType, containerId, amount) {
                     }]
                 });
             },
-            onApprove: function(data, actions) {
-                return actions.order.capture().then(async function(details) {
+            onApprove: function (data, actions) {
+                return actions.order.capture().then(async function (details) {
                     showNotification(i18n.t('payment_approved', 'Paiement approuvé ! Mise à jour de votre compte...'), 'info');
-                    
+
                     try {
                         const res = await fetch('api/upgrade.php', {
                             method: 'POST',
-                            headers: {'Content-Type': 'application/json'},
+                            headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({
                                 orderID: data.orderID,
                                 planType: planType
                             })
                         });
                         const result = await res.json();
-                        
+
                         if (result.status === 'success') {
                             showNotification(i18n.t('upgrade_success', 'Compte surclassé avec succès ! Bienvenue en PRO.'), 'success');
                             document.getElementById('modal-upgrade').classList.remove('active');
@@ -1891,7 +1978,7 @@ function setupPayPal(planType, containerId, amount) {
                     }
                 });
             },
-            onError: function(err) {
+            onError: function (err) {
                 showNotification(i18n.t('error_paypal', 'Erreur lors du paiement PayPal.'), 'error');
                 console.error(err);
             }
@@ -1930,7 +2017,7 @@ if (btnToggleCols && dropdownCols) {
     btnToggleCols.addEventListener('click', (e) => {
         // Toggle if click is on the th or icon, not inside the dropdown itself
         if (e.target.closest('#dropdown-columns')) return;
-        
+
         const isHidden = dropdownCols.classList.contains('hidden');
         if (isHidden) {
             dropdownCols.classList.remove('hidden');
@@ -1941,14 +2028,14 @@ if (btnToggleCols && dropdownCols) {
             dropdownCols.classList.add('hidden');
         }
     });
-    
+
     // Close dropdown when clicking outside
     document.addEventListener('click', (e) => {
         if (!btnToggleCols.contains(e.target)) {
             dropdownCols.classList.add('hidden');
         }
     });
-    
+
     // Checkboxes
     const updateCols = () => {
         const cols = {
@@ -1962,7 +2049,7 @@ if (btnToggleCols && dropdownCols) {
             location: document.getElementById('chk-col-location').checked
         };
         localStorage.setItem('mega_cols', JSON.stringify(cols));
-        
+
         // Toggle on TH
         document.querySelector('th.col-tag')?.classList.toggle('hidden-col', !cols.tag);
         document.querySelector('th.col-date')?.classList.toggle('hidden-col', !cols.date);
@@ -1972,7 +2059,7 @@ if (btnToggleCols && dropdownCols) {
         document.querySelector('th.col-version')?.classList.toggle('hidden-col', !cols.version);
         document.querySelector('th.col-duration')?.classList.toggle('hidden-col', !cols.duration);
         document.querySelector('th.col-location')?.classList.toggle('hidden-col', !cols.location);
-        
+
         // Toggle on TD
         document.querySelectorAll('td.col-tag').forEach(td => td.classList.toggle('hidden-col', !cols.tag));
         document.querySelectorAll('td.col-date').forEach(td => td.classList.toggle('hidden-col', !cols.date));
@@ -1983,14 +2070,14 @@ if (btnToggleCols && dropdownCols) {
         document.querySelectorAll('td.col-duration').forEach(td => td.classList.toggle('hidden-col', !cols.duration));
         document.querySelectorAll('td.col-location').forEach(td => td.classList.toggle('hidden-col', !cols.location));
     };
-    
+
     ['tag', 'date', 'mod', 'type', 'size', 'version', 'duration', 'location'].forEach(c => {
         document.getElementById(`chk-col-${c}`)?.addEventListener('change', updateCols);
     });
-    
+
     // Init state from localstorage
     const savedCols = JSON.parse(localStorage.getItem('mega_cols')) || { tag: true, date: true, mod: true, type: true, size: true, version: true, duration: true, location: true };
-    
+
     ['tag', 'date', 'mod', 'type', 'size', 'version', 'duration', 'location'].forEach(c => {
         const chk = document.getElementById(`chk-col-${c}`);
         if (chk) chk.checked = !!savedCols[c];
@@ -2005,10 +2092,10 @@ let currentIsBlob = false;
 function showMediaViewer(title, url, isVideo, isBlob = false) {
     document.getElementById('modal-media-viewer').classList.add('active');
     document.getElementById('media-viewer-title').textContent = title;
-    
+
     const content = document.getElementById('media-viewer-content');
     content.innerHTML = '';
-    
+
     if (isVideo) {
         const video = document.createElement('video');
         video.src = url;
@@ -2026,10 +2113,10 @@ function showMediaViewer(title, url, isVideo, isBlob = false) {
         img.style.objectFit = 'contain';
         content.appendChild(img);
     }
-    
+
     document.getElementById('media-viewer-download').href = url;
     document.getElementById('media-viewer-download').download = title;
-    
+
     currentMediaUrl = url;
     currentIsBlob = isBlob;
 };
@@ -2037,7 +2124,7 @@ function showMediaViewer(title, url, isVideo, isBlob = false) {
 document.getElementById('close-media-viewer')?.addEventListener('click', () => {
     document.getElementById('modal-media-viewer').classList.remove('active');
     document.getElementById('media-viewer-content').innerHTML = ''; // Stop video
-    
+
     if (currentIsBlob && currentMediaUrl) {
         window.URL.revokeObjectURL(currentMediaUrl);
     }
@@ -2045,113 +2132,11 @@ document.getElementById('close-media-viewer')?.addEventListener('click', () => {
     currentIsBlob = false;
 });
 
-// Navigation logic for external views
-document.addEventListener('DOMContentLoaded', () => {
-    const navDrive = document.getElementById('nav-drive');
-    const navDevices = document.getElementById('nav-devices');
-    const navShared = document.getElementById('nav-shared');
-    const navObject = document.getElementById('nav-object');
-    
-    const fileManager = document.getElementById('file-manager');
-    const viewDevices = document.getElementById('view-devices');
-    const viewShared = document.getElementById('view-shared');
-    const viewObject = document.getElementById('view-object');
-    
-    // UI elements to hide/show
-    const actionBar = document.querySelector('.action-bar-mega');
-    const breadcrumbs = document.querySelector('.breadcrumbs-mega');
-    const topbarSearch = document.querySelector('.topbar-search');
-
-    function hideAllViews() {
-        if(fileManager) fileManager.classList.add('hidden');
-        if(viewDevices) viewDevices.classList.add('hidden');
-        if(viewShared) viewShared.classList.add('hidden');
-        if(viewObject) viewObject.classList.add('hidden');
-        
-        if(actionBar) actionBar.style.display = 'none';
-        if(breadcrumbs) breadcrumbs.style.display = 'none';
-        if(topbarSearch) topbarSearch.style.visibility = 'hidden';
-    }
-
-    if (navDrive) {
-        navDrive.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelectorAll('.sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
-            navDrive.classList.add('active');
-            
-            hideAllViews();
-            
-            if(fileManager) fileManager.classList.remove('hidden');
-            if(actionBar) actionBar.style.display = 'flex';
-            if(breadcrumbs) breadcrumbs.style.display = 'block';
-            if(topbarSearch) topbarSearch.style.visibility = 'visible';
-        });
-    }
-
-    if (navDevices && viewDevices) {
-        navDevices.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelectorAll('.sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
-            navDevices.classList.add('active');
-            
-            hideAllViews();
-            viewDevices.classList.remove('hidden');
-        });
-    }
-
-    if (navObject && viewObject) {
-        navObject.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelectorAll('.sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
-            navObject.classList.add('active');
-            
-            hideAllViews();
-            viewObject.classList.remove('hidden');
-        });
-    }
-    
-    if (navShared && viewShared) {
-        navShared.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelectorAll('.sidebar-nav .nav-item').forEach(el => el.classList.remove('active'));
-            navShared.classList.add('active');
-            
-            hideAllViews();
-            viewShared.classList.remove('hidden');
-        });
-        
-        // Internal Tabs logic for Shared View
-        const sharedTabs = document.querySelectorAll('.shared-tab');
-        const sharedPanels = document.querySelectorAll('.shared-content-panel');
-        
-        sharedTabs.forEach(tab => {
-            tab.addEventListener('click', () => {
-                // Remove active class from all tabs & panels
-                sharedTabs.forEach(t => t.classList.remove('active'));
-                sharedPanels.forEach(p => p.classList.remove('active'));
-                
-                // Add active to clicked tab
-                tab.classList.add('active');
-                
-                // Show target panel
-                const targetId = tab.getAttribute('data-target');
-                const targetPanel = document.getElementById(targetId);
-                if(targetPanel) {
-                    targetPanel.classList.add('active');
-                }
-            });
-        });
-        
-        // Load links when the shared view is opened
-        navShared.addEventListener('click', loadSharedLinks);
-    }
-});
-
 async function loadSharedLinks() {
     try {
         const response = await fetch('api/shared_links.php');
         const data = await response.json();
-        
+
         if (data.status === 'success') {
             renderSharedLinks(data.links);
         }
@@ -2163,34 +2148,34 @@ async function loadSharedLinks() {
 function renderSharedLinks(links) {
     const tbody = document.querySelector('#shared-links table tbody');
     if (!tbody) return;
-    
+
     tbody.innerHTML = '';
-    
+
     if (links.length === 0) {
         tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; padding: 30px; color: #888;">${i18n.t('no_shared_links', "Vous n'avez créé aucun lien de partage pour l'instant.")}</td></tr>`;
         return;
     }
-    
+
     links.forEach(link => {
         const tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #1a1a1a';
         tr.style.cursor = 'pointer';
-        
+
         const dateStr = new Date(link.created_at).toLocaleString('fr-FR', {
             day: '2-digit', month: '2-digit', year: 'numeric',
-            hour: '2-digit', minute:'2-digit'
+            hour: '2-digit', minute: '2-digit'
         });
-        
-        const icon = link.item_type === 'folder' 
-            ? '<i class="fa-solid fa-folder" style="color: #3b82f6; margin-right: 8px;"></i>' 
+
+        const icon = link.item_type === 'folder'
+            ? '<i class="fa-solid fa-folder" style="color: #3b82f6; margin-right: 8px;"></i>'
             : getFileIcon(link.name); // Reusing getFileIcon from app.js
-            
+
         const sizeStr = link.item_type === 'folder' ? '-' : formatSize(link.size);
         const typeStr = link.item_type === 'folder' ? i18n.t('type_folder', 'Dossier') : (link.type || i18n.t('type_file', 'Fichier'));
-        
+
         const _basePath4 = window.location.pathname.replace(/\/[^\/]*$/, '');
         const linkUrl = window.location.origin + _basePath4 + '/share.html?token=' + link.shared_link_token;
-        
+
         tr.innerHTML = `
             <td style="padding: 10px;"><input type="checkbox"></td>
             <td style="padding: 10px; max-width: 250px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${icon} ${link.name}</td>
@@ -2205,7 +2190,7 @@ function renderSharedLinks(links) {
                 <i class="fa-solid fa-link" style="color: #888;" onclick="event.stopPropagation(); navigator.clipboard.writeText('${linkUrl}'); showNotification(i18n.t('link_copied', 'Lien copié dans le presse-papiers'));"></i>
             </td>
         `;
-        
+
         tbody.appendChild(tr);
     });
 }
@@ -2216,7 +2201,7 @@ document.getElementById('menu-toggle-hidden')?.addEventListener('click', () => {
     showHiddenFiles = !showHiddenFiles;
     const icon = document.querySelector('#menu-toggle-hidden i');
     const text = document.querySelector('#menu-toggle-hidden span');
-    
+
     if (showHiddenFiles) {
         icon.classList.remove('fa-eye-slash');
         icon.classList.add('fa-eye');
@@ -2228,7 +2213,7 @@ document.getElementById('menu-toggle-hidden')?.addEventListener('click', () => {
         icon.style.color = '#aeb4c0';
         text.textContent = i18n.t('menu_toggle_hidden', 'Afficher éléments cachés');
     }
-    
+
     document.getElementById('modal-user-menu').classList.add('hidden');
     loadItems();
 });
@@ -2245,15 +2230,28 @@ function getTargetsToProcess() {
 // --- View Modes & Sorting ---
 function applyViewMode() {
     const fileManager = document.getElementById('file-manager');
-    if (!fileManager) return;
-    
-    fileManager.classList.remove('view-compact', 'view-grid');
-    if (currentViewMode === 'compact') {
-        fileManager.classList.add('view-compact');
-    } else if (currentViewMode === 'grid') {
-        fileManager.classList.add('view-grid');
+    const sharedLinks = document.getElementById('shared-links'); // On cible aussi le tableau des partages
+
+    // Appliquer au gestionnaire principal
+    if (fileManager) {
+        fileManager.classList.remove('view-compact', 'view-grid');
+        if (currentViewMode === 'compact') {
+            fileManager.classList.add('view-compact');
+        } else if (currentViewMode === 'grid') {
+            fileManager.classList.add('view-grid');
+        }
     }
-    
+
+    // Appliquer aux éléments partagés
+    if (sharedLinks) {
+        sharedLinks.classList.remove('view-compact', 'view-grid');
+        if (currentViewMode === 'compact') {
+            sharedLinks.classList.add('view-compact');
+        } else if (currentViewMode === 'grid') {
+            sharedLinks.classList.add('view-grid');
+        }
+    }
+
     document.querySelectorAll('.view-controls .btn-icon').forEach(btn => btn.classList.remove('active'));
     if (currentViewMode === 'list') document.getElementById('btn-view-list')?.classList.add('active');
     if (currentViewMode === 'compact') document.getElementById('btn-view-compact')?.classList.add('active');
@@ -2277,7 +2275,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('mega_view_mode', 'grid');
         applyViewMode();
     });
-    
+
     // Sort Headers
     document.querySelectorAll('th[data-sort]').forEach(th => {
         th.addEventListener('click', () => {
@@ -2288,7 +2286,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentSortBy = sortField;
                 currentSortOrder = 'asc';
             }
-            
+
             // Update icons
             document.querySelectorAll('th[data-sort] .sort-icon').forEach(icon => {
                 icon.className = 'fa-solid fa-sort sort-icon';
@@ -2299,8 +2297,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon.className = currentSortOrder === 'asc' ? 'fa-solid fa-arrow-up sort-icon' : 'fa-solid fa-arrow-down sort-icon';
                 icon.style.opacity = '1';
             }
-            
+
             loadItems();
         });
     });
+});
+
+// ===========================================================
+// Exportation de la Clé de récupération depuis le menu
+// ===========================================================
+document.addEventListener('DOMContentLoaded', () => {
+    const exportKeyBtn = document.getElementById('dropdown-export-key');
+
+    if (exportKeyBtn) {
+        exportKeyBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            // Récupération de la clé exacte utilisée dans ton système
+            const masterKey = sessionStorage.getItem('master_key');
+
+            if (!masterKey) {
+                showNotification("Erreur : La clé est introuvable. Veuillez vous reconnecter.", "error");
+                return;
+            }
+
+            // Création du fichier .txt
+            const blob = new Blob([masterKey], { type: 'text/plain' });
+            const url = window.URL.createObjectURL(blob);
+
+            // Création du téléchargement invisible
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'MEGA_RECOVERY_KEY.txt';
+
+            // Déclenchement
+            document.body.appendChild(a);
+            a.click();
+
+            // Nettoyage de la mémoire temporaire
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+
+            // Fermeture du menu et notification de succès
+            const userMenu = document.getElementById('modal-user-menu');
+            if (userMenu) userMenu.classList.add('hidden');
+            showNotification("Clé de récupération téléchargée !", "success");
+        });
+    }
 });
